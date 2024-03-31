@@ -1,7 +1,7 @@
 
 from GCodeGenerator import GCodeGenerator
 
-class WallPrinter:
+class SimpleWall:
     def __init__(self, p1, p2, height):
         self.p1 = p1
         self.p2 = p2
@@ -14,9 +14,9 @@ class WallPrinter:
             # 'M140 S[first_layer_bed_temperature]          ; heatbed temperature',
             # 'M190 S[first_layer_bed_temperature]          ; wait for the bed to heat up',
             # 'M83                                          ; extruder relative mode',
-            'G28                                          ; home all axes',
+            'G28                                          ',#; home all axes,
             # 'G29                                          ; Bed autolevel (optional, for BLTouch only)',
-            'G92 E0                                       ; reset extruder',
+            'G92 E0                                       ',#; reset extruder',
             # 'G1 X0 Y0 F5000                               ; move to 0/0/0',
             'G1 Z0.2',
             # 'M109 S[first_layer_temperature]              ; Heat up extruder',
@@ -48,5 +48,5 @@ class WallPrinter:
 
 # Run test that prints the generated gcode of this class:
 if __name__ == '__main__':
-    wall_printer = WallPrinter((0, 0), (100, 0), 10)
+    wall_printer = SimpleWall((0, 0), (100, 0), 10)
     print(wall_printer.generate_gcode())

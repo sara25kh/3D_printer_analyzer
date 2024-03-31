@@ -27,11 +27,15 @@ class SerialHandler:
     def write(self, data):
         # Implement the logic to write data to the serial connection
         if self.serial is not None:
+            if isinstance(data, str):
+                data = data.encode()
             self.serial.write(data)
     
     def writeln(self, data):
         # Write data with newline character
         if self.serial is not None:
+            if isinstance(data, str):
+                data = data.encode()
             self.serial.write(data + b'\n')
 
     def set_receive_handler(self, handler):
