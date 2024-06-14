@@ -1,5 +1,5 @@
 import time
-from Serial import SerialHandler, SerialPortLister
+from .Serial import SerialHandler, SerialPortLister
 
 class SerialPrinterHandler:
     def __init__(self, port_name, baudrate):
@@ -29,6 +29,9 @@ def create_serial_printer_handler():
     # Ask the user to select a port by index
     lister = SerialPortLister()
     ports = lister.list_ports()
+    if not ports:
+        print("No ports available")
+        return None
     print("Available Ports:")
     for i, port in enumerate(ports):
         print(f"{i}: {port}")

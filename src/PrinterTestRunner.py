@@ -1,14 +1,35 @@
-from SimpleWall import SimpleWall
-from SerialPrinterHandler import create_serial_printer_handler
+from .SimpleWall import SimpleWall
+from .SerialPrinterHandler import create_serial_printer_handler
 import time
 
-# Your code here
 class PrinterTestRunner:
     # This class recognizes the different tests and gives the output that 
     # are needed to be given to the printer
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(PrinterTestRunner, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
 
     def __init__(self, serial_printer_handler):
+        self._init__()
         self.serial_printer_handler = serial_printer_handler
+    
+    def __init__(self):
+        self.test_list = [
+                {
+                    "name": "SimpleWall",
+                    "parameters": {
+                        "start": ["NUMBER", "NUMBER"],
+                        "end": ["NUMBER", "NUMBER"],
+                        "width": "NUMBER"
+                    }
+                }
+            ]
+    
+    def get_test_list(self):
+        return self.test_list
 
     def run(self, test_type):
         gcode_list = []

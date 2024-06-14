@@ -8,12 +8,12 @@
 #   -Curved wall
 #   -Curved roofs
 
-from src import App
+from src.App import app
 
 
 
 
 if __name__ == '__main__':
     print("This is a G-Code generator for 3D printers")
-    app = App()
+    # app = App()
     app.run()
