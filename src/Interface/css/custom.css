@@ -1,0 +1,11 @@
+.picture {
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+}
+.description {
+    text-align: center;
+}
+.decription_image {
+    width: 100%;
+}

@@ -1,0 +1,44 @@
+.container {
+    display: flex;
+    align-items: center;
+}
+
+.form-container {
+    flex: 1;
+    padding: 20px;
+}
+
+.image-container {
+    flex: 1;
+    padding: 20px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 10px;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    padding: 10px 20px;
+    margin-right: 10px;
+}
