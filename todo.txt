@@ -1,0 +1,5 @@
+
+* Implement the submit functionality on the interface to start the print process
+* Get the simple wall test up and ready to use
+* Find out what test cases to have
+* Make pictures for the test cases

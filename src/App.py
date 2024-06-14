@@ -8,8 +8,8 @@
 
 from flask import Flask, render_template, send_from_directory
 import os
-from .PrinterTestRunner import PrinterTestRunner
-from .SerialPrinterHandler import create_serial_printer_handler
+from PrinterTestRunner import PrinterTestRunner
+from SerialPrinterHandler import create_serial_printer_handler
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 interface_dir = os.path.join(script_dir, 'Interface')

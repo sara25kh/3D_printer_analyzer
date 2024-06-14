@@ -12,9 +12,14 @@
                 {% for key, value in parameters.items() %}
                     <label for="{{ key }}">{{ key.capitalize() }}:</label>
                     <br>
-                    {% if value is iterable and not value is string %}
+                    {% if value is iterable and not value is string and not value is mapping %}
                         {% for i in range(value|length) %}
                             <input type="number" id="{{ key }}{{ i }}" name="{{ key }}{{ i }}" placeholder="{{ key }} coordinate" value="{{ value[i] }}">
+                            <br>
+                        {% endfor %}
+                    {% elif value is mapping %}
+                        {% for k, v in value.items() %}
+                            <input type="number" id="{{ key }}{{ k }}" name="{{ key }}{{ k }}" placeholder="{{ key }}.{{ k }} coordinate" value="{{ v }}">
                             <br>
                         {% endfor %}
                     {% else %}
