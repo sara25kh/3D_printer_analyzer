@@ -9,7 +9,6 @@
 from flask import Flask, render_template, send_from_directory
 import os
 from .printerTestRunner import PrinterTestRunner
-from .serialPrinterHandler import create_serial_printer_handler
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 interface_dir = os.path.join(script_dir, 'Interface')
@@ -17,7 +16,6 @@ interface_dir = os.path.join(script_dir, 'Interface')
 app = Flask(__name__, static_folder=interface_dir, template_folder=interface_dir)
 
 # Create an instance of PrinterTestRunner
-# serial_printer_handler = create_serial_printer_handler()
 printer_test_runner = PrinterTestRunner()
 
 # Add custom filters to the Jinja2 environment

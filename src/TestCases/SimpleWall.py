@@ -1,11 +1,93 @@
 
 from ..gCodeGenerator import GCodeGenerator
+from ..helper import flatten
+import re
 
-class SimpleWall:
-    def __init__(self, p1, p2, height):
-        self.p1 = p1
-        self.p2 = p2
-        self.height = height
+
+class TestCaseBase:
+
+    def __init__(self):
+        self.params = {}
+
+    def get_parameters(self):
+        return self.params
+    
+    def set_parameters(self, values):
+        flat_params = flatten(self.params)
+        flat_values = flatten(values)
+        # print("flat_params", flat_params)
+        # print("flat_values", flat_values)
+
+        try:
+            for given_val_key, given_val_value in flat_values.items():
+                if(given_val_key.endswith("value")):
+                    param_type_key = re.sub(r'\.value', '.type', given_val_key)
+                    if(param_type_key in flat_params.keys()):
+                        type_check_result = None
+                        if flat_params[param_type_key] == "NUMBER":
+                            if(isinstance(given_val_value, str)):
+                                try:
+                                    given_val_value = float(given_val_value)
+                                except:
+                                    type_check_result = False
+                            type_check_result = isinstance(given_val_value, (int, float))
+                        elif flat_params[param_type_key] == "STRING":
+                            type_check_result = isinstance(given_val_value, str)
+                        else:
+                            raise(Exception(f"Undefined type for {param_type_key}"))
+                        
+                        if not type_check_result:
+                            raise(Exception(f"Value '{given_val_value}' in '{given_val_key}' is not a '{flat_params[param_type_key]}'"))
+                    else:
+                        key_name = re.sub(r'\.value', '', given_val_key)
+                        raise(Exception(f"Key '{key_name}' is not defined"))
+                    
+                    # Ok, lets write it to the params
+                    tmp_sub_param = self.params
+                    for key in given_val_key.split("."):
+                        if(isinstance(tmp_sub_param[key], dict)):
+                            tmp_sub_param = tmp_sub_param[key]
+                        else:
+                            tmp_sub_param[key] = given_val_value
+                    
+        except Exception as e:
+            print(e)
+            return False
+        
+        return True
+    
+    def generate_gcode(self):
+        raise(Exception("generate_gcode(): Not implemented"))
+
+class SimpleWall(TestCaseBase):
+    name = "SimpleWall"
+    def __init__(self):
+        self.params = {
+            "start": {
+                'x':{
+                    "type":"NUMBER", 
+                    "value": 50
+                },
+                'y':{
+                    "type":"NUMBER",
+                    "value": 100
+                }
+            },
+            "end": {
+                'x':{
+                    "type":"NUMBER", 
+                    "value": 100
+                },
+                'y':{
+                    "type":"NUMBER",
+                    "value": 100
+                }
+            },
+            "height": {
+                "type":"NUMBER",
+                "value": 5
+            }
+        }
 
     def generate_gcode(self):
         gcode_generator = GCodeGenerator()
@@ -29,17 +111,18 @@ class SimpleWall:
             # 'G1 X200 Y5.3 Z0.3 F5000.0                    ; move to side a little',
             # 'G1 X5.3  Y5.3 Z0.3 F1500.0 E30               ; draw 2nd line'
         ])
-        gcode_generator.move(self.p1[0], self.p1[1], 0)
+
+        gcode_generator.move(self.params["start"]["x"]["value"], self.params["start"]["y"]["value"], 0)
         gcode_generator.set_extrude_rate(0)
 
         # Move to the starting position
-        gcode_generator.move(self.p1[0], self.p1[1])
+        gcode_generator.move(self.params["start"]["x"]["value"], self.params["start"]["y"]["value"])
 
         # Generate GCode for each layer
-        while gcode_generator.total_z < self.height:
-            gcode_generator.move_and_extrude(self.p2[0], self.p2[1])
+        while gcode_generator.total_z < self.params["height"]["value"]:
+            gcode_generator.move_and_extrude(self.params["end"]["x"]["value"], self.params["end"]["y"]["value"])
             gcode_generator.go_to_next_layer()
-            gcode_generator.move_and_extrude(self.p1[0], self.p1[1])
+            gcode_generator.move_and_extrude(self.params["start"]["x"]["value"], self.params["start"]["y"]["value"])
             gcode_generator.go_to_next_layer()
 
         return gcode_generator.generate()
@@ -48,5 +131,5 @@ class SimpleWall:
 
 # Run test that prints the generated gcode of this class:
 if __name__ == '__main__':
-    wall_printer = SimpleWall((0, 0), (100, 0), 10)
+    wall_printer = SimpleWall()
     print(wall_printer.generate_gcode())

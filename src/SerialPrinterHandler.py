@@ -45,29 +45,7 @@ class SerialPrinterHandler:
             response = self.serial_handler.serial.readline().decode().strip()
             print("res: ", response)
 
-# def create_serial_printer_handler():
-#     # Ask the user to select a port by index
-#     lister = SerialPortLister()
-#     ports = lister.list_ports()
-#     if not ports:
-#         print("No ports available")
-#         return None
-#     print("Available Ports:")
-#     for i, port in enumerate(ports):
-#         print(f"{i}: {port}")
-#     port_index = int(input("Select a port by index (default: 0): ") or 0)
-#     port = ports[port_index]
-#     print(f"Selected Port: {port}")
-
-#     # Ask the user to input the baudrate
-#     baudrate = int(input("Enter the baudrate (default: 115200): ") or 115200)
-
-#     # Create and return a SerialPrinterHandler instance
-#     return SerialPrinterHandler(port, baudrate)
-
-
-
-if __name__ == '__main__':
+def create_serial_printer_handler_by_cli_input():
     serial_printer_handler = SingletonSerialPrinterHandler()
 
     serial_port_list = serial_printer_handler.get_serial_ports_list()
@@ -84,6 +62,12 @@ if __name__ == '__main__':
     # Ask the user to input the baudrate
     baudrate = int(input("Enter the baudrate (default: 115200): ") or 115200)
     serial_printer_handler.start(port, baudrate)
+
+    return serial_printer_handler
+
+if __name__ == '__main__':
+
+    serial_printer_handler = create_serial_printer_handler_by_cli_input()
 
     #Write some data
     while True:
