@@ -8,7 +8,7 @@
 #   -Curved wall
 #   -Curved roofs
 
-from src.App import app
+from src.app import app
 
 
 

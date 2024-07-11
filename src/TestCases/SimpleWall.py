@@ -1,5 +1,5 @@
 
-from GCodeGenerator import GCodeGenerator
+from ..gCodeGenerator import GCodeGenerator
 
 class SimpleWall:
     def __init__(self, p1, p2, height):

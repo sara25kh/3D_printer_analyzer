@@ -1,7 +1,6 @@
-from TestCases.SimpleWall import SimpleWall
-from SerialPrinterHandler import create_serial_printer_handler
+from .serialPrinterHandler import create_serial_printer_handler
 import time
-from TestCases.SimpleWall import SimpleWall
+from .testCases.simpleWall import SimpleWall
 
 class PrinterTestRunner:
     # This class recognizes the different tests and gives the output that 

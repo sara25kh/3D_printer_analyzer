@@ -1,5 +1,5 @@
 import time
-from Serial import SerialHandler, SerialPortLister
+from .serial import SerialHandler, SerialPortLister
 
 class SerialPrinterHandler:
     def __init__(self, port_name, baudrate):
