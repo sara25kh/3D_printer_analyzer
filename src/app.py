@@ -6,7 +6,7 @@
 # that it will navigate to pages that are related to the 
 # specific printer test
 
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request
 import os
 from .printerTestRunner import PrinterTestRunner
 
@@ -39,6 +39,15 @@ def test_page(test_name):
     print(f"api:: found test_obj: {test_obj}")
 
     return test_obj.get_parameters()
+
+@app.route('/api/v1/test/run_test/<test_name>', methods=['POST'])
+def process_test(test_name):
+    # Process the test
+    print(f"api:: Processing test_name: {test_name}")
+    print(f"api:: request.get_json():", request.get_json())
+    printer_test_runner.run(test_name, request.get_json())
+
+    return {"status": "success"}
 
 @app.route('/test/testcase.html')
 def serve_test():

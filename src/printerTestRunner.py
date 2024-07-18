@@ -1,6 +1,7 @@
 from .serialPrinterHandler import create_serial_printer_handler_by_cli_input
 import time
 from .testCases.simpleWall import SimpleWall
+import threading
 
 class PrinterTestRunner:
     # This class recognizes the different tests and gives the output that 
@@ -16,6 +17,11 @@ class PrinterTestRunner:
         self.test_list = [
                 SimpleWall()
             ]
+        self.state = "READY"
+        self.testrun_thread = None
+        self.testrun_thread_log = []
+        self.max_thread_log = 100
+        self.serial_printer_handler = None
     
     def set_serial_printer_handler(self, serial_printer_handler):
         self.serial_printer_handler = serial_printer_handler
@@ -23,7 +29,13 @@ class PrinterTestRunner:
     def get_test_list(self):
         return self.test_list
 
-    def run(self, test_name, parameters):
+    def launch_testrun(self, test_name, parameters):
+
+        if self.serial_printer_handler is None:
+            raise Exception("Serial printer handler is not set")
+        if self.state != "READY":
+            raise Exception("Printer is not ready")
+        
         test_obj = self.get_test_object(test_name)
         if not test_obj:
             raise Exception("Invalid test type")
@@ -32,8 +44,13 @@ class PrinterTestRunner:
         if not test_obj.set_parameters(parameters):
             raise Exception("Invalid parameters")
         print("final change:", test_obj.get_parameters())
-        return
 
+        self.testrun_thread = threading.Thread(target=self.testrun, args=(test_obj,))
+        self.testrun_thread.start()
+    
+    # The thread function that feeds the generated GCode to the printer
+    def testrun(self, test_obj):
+        self.state = "RUNNING"
         gcode_list = test_obj.generate_gcode()
         
         # Wait for the printer to get ready
@@ -41,8 +58,18 @@ class PrinterTestRunner:
 
         # Feed the gcode_list to the serial port
         for gcode in gcode_list:
-            self.serial_printer_handler.send(gcode)
-            print(f"finished: {gcode}")
+            # print(f"Sent: {gcode}")
+            self.testrun_thread_log.append(f"Sent: {gcode}")
+            printer_log = self.serial_printer_handler.send(gcode)
+            # print(f"printer_log: {printer_log}")
+            self.testrun_thread_log.extend(printer_log)
+            # Remove the logs if it exceeds the max_thread_log
+            if len(self.testrun_thread_log) > self.max_thread_log:
+                self.testrun_thread_log = self.testrun_thread_log[-self.max_thread_log:]
+        
+        #Done!!!
+        self.state = "READY"
+
 
     def get_test_object(self, test_name):
         return next((test for test in self.test_list if test.name == test_name), None)
@@ -64,20 +91,30 @@ class PrinterTestRunner:
 #Test the class
 if __name__ == '__main__':
     # Create a serial printer handler
-    # serial_printer_handler = create_serial_printer_handler_by_cli_input()
+    serial_printer_handler = create_serial_printer_handler_by_cli_input()
 
     # Create a PrinterTestRunner instance
     printer_test_runner = PrinterTestRunner()
-    # printer_test_runner.set_serial_printer_handler(serial_printer_handler)
+    printer_test_runner.set_serial_printer_handler(serial_printer_handler)
 
     # print("SimpleWall parameter structure:", printer_test_runner.get_parameter_structure('SimpleWall'))
 
     # Run the test
-    printer_test_runner.run("SimpleWall", {
+    printer_test_runner.launch_testrun("SimpleWall", {
         "start": {'x.value':50, 'y.value':50},
         "end": {'x.value':100, 'y.value':50},
-        "height.value": 3
+        "height.value": 1
     })
+
+    while(True):
+        time.sleep(1)
+        # Print the logs & remove each printed log
+        while printer_test_runner.testrun_thread_log:
+            log = printer_test_runner.testrun_thread_log.pop(0)
+            print(log)
+
+        if printer_test_runner.state == "READY":
+            break
 
     # serial_printer_handler.stop()
     print("Done")

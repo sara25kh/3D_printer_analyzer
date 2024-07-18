@@ -131,17 +131,17 @@ function submit_form_data() {
     // Log the JSON object to the console
     console.log(jsonData);
 
-    // // Send the JSON object to the server
-    // fetch("/api/v1/test/process_params/" + uri_get_param('test_name'),
-    // {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-type": "application/json",
-    //     },
-    //     body: JSON.stringify(jsonData),
-    // })
-    // .then((response) => response.json())
-    // .then((json) => console.log(json));
+    // Send the JSON object to the server
+    fetch("/api/v1/test/run_test/" + uri_get_param('test_name'),
+    {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+        },
+        body: JSON.stringify(jsonData),
+    })
+    .then((response) => response.json())
+    .then((json) => console.log(json));
 
     //Put the form in readonly mode
     readonly_form();
