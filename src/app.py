@@ -34,7 +34,7 @@ def home():
 
 @app.route('/api/v1/status/connected')
 def connected():
-    if printer_test_runner.serial_printer_handler.is_connected_to_printer():
+    if printer_test_runner.is_connected_to_printer():
         return {"status": "connected"}
     return {"status": "disconnected"}
 

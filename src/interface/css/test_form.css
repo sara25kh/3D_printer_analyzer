@@ -38,7 +38,7 @@ input[type="number"] {
     justify-content: space-between;
 }
 
-button {
+/* button {
     padding: 10px 20px;
     margin-right: 10px;
     color: rgb(44, 31, 120);
@@ -47,4 +47,4 @@ button {
     position: relative;
     right: -30px;
     top: 200px;
-}
+} */

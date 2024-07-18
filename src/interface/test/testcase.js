@@ -4,6 +4,9 @@ function uri_get_param(name){
     if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
         return decodeURIComponent(name[1]);
 }
+
+//Set title of the page
+document.title = uri_get_param('test_name');
  
 var param_struct = {}
 fetch("/api/v1/test/get_params/" + uri_get_param('test_name'),
@@ -183,13 +186,16 @@ function connectSerial() {
     const serialPortDropdown = document.getElementById('serial-port');
     const port = serialPortDropdown.value;
 
+    // Get the baudrate from input serial-baudrate
+    const baudrate = document.getElementById('serial-baudrate').value;
+
     // Make a POST request to /api/v1/printer with param "cmd": "connect"
     fetch("/api/v1/printer/connect", {
         method: "POST",
         headers: {
             "Content-type": "application/json",
         },
-        body: JSON.stringify({ 'port': port, 'baudrate': 115200 }),
+        body: JSON.stringify({ 'port': port, 'baudrate': baudrate }),
     })
     .then((response) => response.json())
     .then((json) => {
@@ -217,6 +223,38 @@ const connectButton = document.getElementById('connect-serial');
 
 // Add an event listener to the connect button
 connectButton.addEventListener('click', connectSerial);
+
+//Function to check it the serial is already connected or not
+function updateSerialStatus(){
+    // Make a GET request
+    fetch("/api/v1/status/connected", {
+        method: "GET",
+        headers: {
+            "Content-type": "application/json",
+        },
+    })
+    .then((response) => response.json())
+    .then((json) => {
+        console.log("Serial status:", json);
+        // Get the connect button
+        const connectButton = document.getElementById('connect-serial');
+
+        //If the serial is already connected
+        if(json.status === 'connected'){
+            // Change the text of the connect button
+            connectButton.textContent = 'Connected';
+
+            // Disable the connect button
+            connectButton.disabled = true;
+        }else{
+            // Change the text of the connect button
+            connectButton.textContent = 'Connect to Printer\'s Serial';
+
+            // Enable the connect button
+            connectButton.disabled = false
+        }
+    });
+}
 
 //Function to update the serial port dropdown list
 function updateSerialPorts() {
@@ -247,7 +285,26 @@ function updateSerialPorts() {
         //If there is any option put the first option as selected
         if (json.ports.length > 0) {
             serialPortDropdown.selectedIndex = 0;
+        }else{
+            const option = document.createElement('option');
+            option.value = "No ports";
+            option.textContent = "No ports";
+            serialPortDropdown.appendChild(option);
+            serialPortDropdown.selectedIndex = 0;
+
+            //Disable the connect button
+            const connectButton = document.getElementById('connect-serial');
+            connectButton.disabled = true;
         }
     });
 }
-updateSerialPorts();
+// updateSerialPorts();
+
+// Call a function to update the serial port_list every 5 seconds
+function update_cycle_interval_func(){
+    updateSerialStatus();
+    updateSerialPorts();
+}
+update_cycle_interval_func();
+setInterval(update_cycle_interval_func, 5000);
+
