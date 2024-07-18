@@ -5,7 +5,7 @@ function uri_get_param(name){
         return decodeURIComponent(name[1]);
 }
  
-
+var param_struct = {}
 fetch("/api/v1/test/get_params/" + uri_get_param('test_name'),
 {
     method: "GET",
@@ -14,9 +14,13 @@ fetch("/api/v1/test/get_params/" + uri_get_param('test_name'),
     },
 })
 .then((response) => response.json())
-.then((json) => update_form(json, document.getElementById("param-form"), 0));
+.then((json) => {
+    param_struct = json;
+    update_form(document.getElementById("param-form"), 0);
+});
 
-function update_form(params, targetElement, level) {
+function update_form(targetElement, level) {
+    let params = param_struct;
     console.log('params:', params);
 
     // Get the target element where the textboxes will be added
@@ -87,34 +91,85 @@ function update_form(params, targetElement, level) {
     }
 }
 
-// //The function which validates and processes the form data when submit is clicked
-// function process_form_data() {
-//     // Get the form element
-//     const formElement = document.getElementById('param-form');
+//The function which validates and processes the form data when submit is clicked
+function submit_form_data() {
+    // Get the form element
+    const formElement = document.getElementById('param-form');
 
-//     // Get the form data
-//     const formData = new FormData(formElement);
+    // Get the form data
+    const formData = new FormData(formElement);
 
-//     // Convert the form data to a JSON object
-//     const jsonData = {};
-//     for (let [key, value] of formData) {
-//         jsonData[key] = value;
-//     }
+    // Get the flatten version of param struct:
+    let flatten_param_struct = {};
+    function flatten_params(params, prefix) {
+        for (let key in params) {
+            if (params.hasOwnProperty(key)) {
+                if (params[key].hasOwnProperty('type')) {
+                    flatten_param_struct[prefix + key] = params[key];
+                } else {
+                    flatten_params(params[key], prefix + key + '.');
+                }
+            }
+        }
+    }
+    flatten_params(param_struct, '');
+    // console.log("flatten_param_struct:", flatten_param_struct);
 
-//     // Log the JSON object to the console
-//     console.log(jsonData);
+    // Convert the form data to a JSON object
+    const jsonData = {};
+    for (let [key, value] of formData) {
+        //Check value based on flatten_param_struct[key].type
+        if (flatten_param_struct[key].type === 'NUMBER') {
+            value = parseFloat(value);
+        } else if (flatten_param_struct[key].type === 'STRING') {
+            value = value;
+        }
 
-//     // Send the JSON object to the server
-//     fetch("/api/v1/test/process_params/" + uri_get_param('test_name'),
-//     {
-//         method: "POST",
-//         headers: {
-//             "Content-type": "application/json",
-//         },
-//         body: JSON.stringify(jsonData),
-//     })
-//     .then((response) => response.json())
-//     .then((json) => console.log(json));
-// }
+        jsonData[key] = value ? value : flatten_param_struct[key].value;
+    }
+
+    // Log the JSON object to the console
+    console.log(jsonData);
+
+    // // Send the JSON object to the server
+    // fetch("/api/v1/test/process_params/" + uri_get_param('test_name'),
+    // {
+    //     method: "POST",
+    //     headers: {
+    //         "Content-type": "application/json",
+    //     },
+    //     body: JSON.stringify(jsonData),
+    // })
+    // .then((response) => response.json())
+    // .then((json) => console.log(json));
+
+    //Put the form in readonly mode
+    readonly_form();
+}
+
+//Function that puts the form in readonly mode:
+function readonly_form() {
+    // Get the form element
+    const formElement = document.getElementById('param-form');
+
+    //Put the form in readonly mode
+    let inputs = formElement.getElementsByTagName('input');
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].readOnly = true;
+        //Change the style of the input
+        inputs[i].style.backgroundColor = '#f8f9fa';
+    }
+
+    //Change the style of the submit button
+    const submitButton = document.getElementById('submit-form');
+    submitButton.textContent = 'Submitted';
+}
+
+
+// Get the submit button
+const submitButton = document.getElementById('submit-form');
+
+// Add an event listener to the submit button
+submitButton.addEventListener('click', submit_form_data);
 
 
