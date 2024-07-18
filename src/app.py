@@ -9,6 +9,7 @@
 from flask import Flask, render_template, send_from_directory, request
 import os
 from .printerTestRunner import PrinterTestRunner
+from .serialPrinterHandler import SingletonSerialPrinterHandler
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 interface_dir = os.path.join(script_dir, 'interface')
@@ -31,6 +32,30 @@ def is_iterable(value):
 def home():
     return app.send_static_file('index.html')
 
+@app.route('/api/v1/status/connected')
+def connected():
+    if printer_test_runner.serial_printer_handler.is_connected_to_printer():
+        return {"status": "connected"}
+    return {"status": "disconnected"}
+
+@app.route('/api/v1/printer/port_list', methods=['GET'])
+def get_port_list():
+    return {"status":"success", "ports": SingletonSerialPrinterHandler().get_serial_ports_list()}
+
+@app.route('/api/v1/printer/connect', methods=['POST'])
+def connect_printer():
+    data = request.get_json()
+    port = data['port']
+    baudrate = data['baudrate']
+    try:
+        print(f"Trying to connect to port: {port} with baudrate: {baudrate}")
+        SingletonSerialPrinterHandler().start(port, baudrate)
+        printer_test_runner.set_serial_printer_handler(SingletonSerialPrinterHandler())
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+    return {"status": "success"}
+
 @app.route('/api/v1/test/get_params/<test_name>')
 def test_page(test_name):
     # Get the test list
@@ -45,7 +70,10 @@ def process_test(test_name):
     # Process the test
     print(f"api:: Processing test_name: {test_name}")
     print(f"api:: request.get_json():", request.get_json())
-    printer_test_runner.run(test_name, request.get_json())
+    try:
+        printer_test_runner.launch_testrun(test_name, request.get_json())
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
     return {"status": "success"}
 

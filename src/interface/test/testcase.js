@@ -141,7 +141,12 @@ function submit_form_data() {
         body: JSON.stringify(jsonData),
     })
     .then((response) => response.json())
-    .then((json) => console.log(json));
+    .then((json) => {
+        // If json['status'] is 'error', display the error message
+        if (json['status'] === 'error') {
+            alert(json['message']);
+        }
+    });
 
     //Put the form in readonly mode
     readonly_form();
@@ -172,4 +177,77 @@ const submitButton = document.getElementById('submit-form');
 // Add an event listener to the submit button
 submitButton.addEventListener('click', submit_form_data);
 
+function connectSerial() {
 
+    // Get the serial selected port from the dropdown list
+    const serialPortDropdown = document.getElementById('serial-port');
+    const port = serialPortDropdown.value;
+
+    // Make a POST request to /api/v1/printer with param "cmd": "connect"
+    fetch("/api/v1/printer/connect", {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+        },
+        body: JSON.stringify({ 'port': port, 'baudrate': 115200 }),
+    })
+    .then((response) => response.json())
+    .then((json) => {
+        console.log("Connect request response:", json);
+        // Get the connect button
+        const connectButton = document.getElementById('connect-serial');
+
+        // Change the text of the connect button
+        connectButton.textContent = 'Connected';
+
+        // Disable the connect button
+        connectButton.disabled = true;
+    })
+    .catch((error) => {
+        const connectButton = document.getElementById('connect-serial');
+        connectButton.textContent = 'Connect to Printer\'s Serial';
+        
+        // Disable the connect button
+        connectButton.disabled = false;
+    });
+}
+
+// Get the connect button
+const connectButton = document.getElementById('connect-serial');
+
+// Add an event listener to the connect button
+connectButton.addEventListener('click', connectSerial);
+
+//Function to update the serial port dropdown list
+function updateSerialPorts() {
+    // Make a GET request to /api/v1/printer/ports
+    fetch("/api/v1/printer/port_list", {
+        method: "GET",
+        headers: {
+            "Content-type": "application/json",
+        },
+    })
+    .then((response) => response.json())
+    .then((json) => {
+        console.log("Serial ports:", json);
+        // Get the serial port dropdown list
+        const serialPortDropdown = document.getElementById('serial-port');
+
+        // Clear the dropdown list
+        serialPortDropdown.innerHTML = '';
+
+        // Create an option for each serial port
+        for (let port of json.ports) {
+            const option = document.createElement('option');
+            option.value = port;
+            option.textContent = port;
+            serialPortDropdown.appendChild(option);
+        }
+
+        //If there is any option put the first option as selected
+        if (json.ports.length > 0) {
+            serialPortDropdown.selectedIndex = 0;
+        }
+    });
+}
+updateSerialPorts();

@@ -22,6 +22,9 @@ class PrinterTestRunner:
         self.testrun_thread_log = []
         self.max_thread_log = 100
         self.serial_printer_handler = None
+
+    def is_connected_to_printer(self):
+        return self.serial_printer_handler is not None
     
     def set_serial_printer_handler(self, serial_printer_handler):
         self.serial_printer_handler = serial_printer_handler
@@ -32,7 +35,7 @@ class PrinterTestRunner:
     def launch_testrun(self, test_name, parameters):
 
         if self.serial_printer_handler is None:
-            raise Exception("Serial printer handler is not set")
+            raise Exception("Serial printer not connected")
         if self.state != "READY":
             raise Exception("Printer is not ready")
         
