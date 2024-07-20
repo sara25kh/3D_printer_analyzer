@@ -6,6 +6,9 @@
 .form-container {
     flex: 1;
     padding: 20px;
+    position: relative;
+    right: -350px;
+    top: 50%;
 }
 
 .image-container {
@@ -47,4 +50,9 @@ button {
     position: relative;
     right: -30px;
     top: 200px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    color: rgb(78, 15, 188);
 }
