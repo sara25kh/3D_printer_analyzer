@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simple Wall Test</title>
+    <title>Test Case</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/test_form.css">
-    <script type="text/javascript" src="testcase.js"></script>
 </head>
 <body>
     <div class="row">
@@ -15,11 +14,16 @@
                 <label for="lname">Last name:</label>
                 <input type="text" id="lname" name="lname"><br><br>
                  -->
-                <div class="button-container">
-                    <button type="submit">Submit</button>
-                    <button type="button">Cancel</button>
-                </div>
             </form>
+            <div class="row">
+                <button class="col-md-6 btn btn-primary" type="button" id="submit-form">Submit</button>
+                <button class="col-md-6 btn btn-primary" type="button">Cancel</button>
+            </div>
+            <div class="row">
+                <button class="col-md-12 btn btn-primary" type="button" id="connect-serial">Connect to Printer's Serial</button> 
+                <select class="col-md-6" id="serial-port"></select>
+                <input class="col-md-6" id="serial-baudrate" value="115200">
+            </div>
         </div>
         <div class="col-md-6">
             <div class="image-container" style="float: right;"></div>
@@ -28,4 +32,5 @@
         </div>
     </div>
 </body>
+    <script type="text/javascript" src="testcase.js"></script>
 </html>

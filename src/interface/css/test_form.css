@@ -41,7 +41,7 @@ input[type="number"] {
     justify-content: space-between;
 }
 
-button {
+/* button {
     padding: 10px 20px;
     margin-right: 10px;
     color: rgb(44, 31, 120);
@@ -55,4 +55,4 @@ button {
 .form-group {
     margin-bottom: 15px;
     color: rgb(78, 15, 188);
-}
+} */

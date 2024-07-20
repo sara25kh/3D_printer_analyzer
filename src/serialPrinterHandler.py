@@ -38,12 +38,16 @@ class SerialPrinterHandler:
     def send(self, command):
         self.empty_recv_queue()
         self.serial_handler.writeln(command)
-        response = self.serial_handler.serial.readline().decode().strip()
-        print("res: ", response)
-        while response != "ok":
-            time.sleep(0.1)
+        recv_queue = []
+        while True:
             response = self.serial_handler.serial.readline().decode().strip()
-            print("res: ", response)
+            if response:
+                # print("res: ", response)
+                recv_queue.append(response)
+            if response == "ok":
+                break
+            time.sleep(0.1)
+        return recv_queue
 
 def create_serial_printer_handler_by_cli_input():
     serial_printer_handler = SingletonSerialPrinterHandler()
