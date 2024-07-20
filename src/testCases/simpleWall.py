@@ -127,9 +127,26 @@ class SimpleWall(TestCaseBase):
 
         return gcode_generator.generate()
 
+    def estimate_print_time(self):
+        # Simple estimation logic based on distance and height
+        start_x = self.params["start"]["x"]["value"]
+        start_y = self.params["start"]["y"]["value"]
+        end_x = self.params["end"]["x"]["value"]
+        end_y = self.params["end"]["y"]["value"]
+        height = self.params["height"]["value"]
 
+        # Calculate distances
+        horizontal_distance = ((end_x - start_x) ** 2 + (end_y - start_y) ** 2) ** 0.5
+        total_distance = horizontal_distance * height
+
+        # Estimate time (in seconds) based on some speed factor, for example, 10 mm/s
+        speed = 10
+        estimated_time = total_distance / speed
+
+        return estimated_time
 
 # Run test that prints the generated gcode of this class:
 if __name__ == '__main__':
     wall_printer = SimpleWall()
     print(wall_printer.generate_gcode())
+    print("Estimated Print Time (seconds):", wall_printer.estimate_print_time())

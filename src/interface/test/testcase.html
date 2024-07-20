@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>Test Case</title>
@@ -8,13 +8,13 @@
 <body>
     <div class="row">
         <div class="col-md-3">
-            <form id="param-form" class="form-container">
+            <form id="param-form" class="form-container"> -->
                 <!-- <label for="fname">First name:</label>
                 <input type="text" id="fname" name="fname"><br><br>
                 <label for="lname">Last name:</label>
                 <input type="text" id="lname" name="lname"><br><br>
                  -->
-            </form>
+            <!-- </form>
             <div class="row">
                 <button class="col-md-6 btn btn-primary" type="button" id="submit-form">Submit</button>
                 <button class="col-md-6 btn btn-primary" type="button">Cancel</button>
@@ -33,4 +33,48 @@
     </div>
 </body>
     <script type="text/javascript" src="testcase.js"></script>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Case</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/test_form.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 form-container">
+                <form id="param-form" class="form">
+                    <!-- Form fields will be generated here -->
+                </form>
+                <div class="button-container">
+                    <button class="btn btn-primary" type="button" id="submit-form">Submit</button>
+                    <button class="btn btn-secondary" type="button">Cancel</button>
+                </div>
+            
+                <div class="progress" id="progress-bar-container">
+                    <div class="progress-bar" id="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+                
+                <div class="serial-connect-container">
+                    <button class="btn btn-primary" type="button" id="connect-serial">Connect to Printer's Serial</button>
+                    <select id="serial-port" class="form-select"></select>
+                    <input id="serial-baudrate" class="form-control" value="115200">
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-secondary" type="button" id="home-button">Home</button>
+                </div>
+
+            </div>
+            <div class="col-md-6 image-container">
+                <img src="../img/simple_wall.png" alt="Parameter Image" id="param-image">
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="testcase.js"></script>
+</body>
 </html>

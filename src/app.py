@@ -28,6 +28,7 @@ def is_string(value):
 def is_iterable(value):
     return isinstance(value, (list, tuple))
 
+
 @app.route('/')
 def home():
     return app.send_static_file('index.html')

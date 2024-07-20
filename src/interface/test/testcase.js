@@ -308,3 +308,47 @@ function update_cycle_interval_func(){
 update_cycle_interval_func();
 setInterval(update_cycle_interval_func, 5000);
 
+
+
+// Function to update the progress bar
+function updateProgressBar(percentage) {
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width = percentage + '%';
+    progressBar.setAttribute('aria-valuenow', percentage);
+    progressBar.textContent = percentage + '%';
+}
+
+// Function to simulate work progress
+function simulateWorkProgress(estimatedTime) {
+    let progress = 0;
+    const intervalTime = 100; // Update every 100 ms
+    const totalIntervals = (estimatedTime * 1000) / intervalTime;
+
+    const interval = setInterval(() => {
+        progress += 100 / totalIntervals; // Calculate the percentage progress
+        if (progress > 100) progress = 100;
+        updateProgressBar(progress);
+
+        if (progress === 100) clearInterval(interval);
+    }, intervalTime);
+}
+
+// Add an event listener to the submit button to start the work progress simulation
+//const submitButton = document.getElementById('submit-form');
+submitButton.addEventListener('click', () => {
+    // Estimate the print time from the parameters (mockup for the example)
+    const estimatedTime = 30; // This value should be fetched or calculated from the backend
+    simulateWorkProgress(estimatedTime);
+});
+
+
+// Function to go back to the previous page
+function goBack() {
+    window.history.back();
+}
+
+// Get the home button
+const homeButton = document.getElementById('home-button');
+
+// Add an event listener to the home button
+homeButton.addEventListener('click', goBack);
