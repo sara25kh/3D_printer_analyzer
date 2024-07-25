@@ -1,5 +1,5 @@
 
-
+//Retrieves the value of a URL query parameter by its name
 function uri_get_param(name){
     if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
         return decodeURIComponent(name[1]);
@@ -8,6 +8,7 @@ function uri_get_param(name){
 //Set title of the page
 document.title = uri_get_param('test_name');
  
+//Fetches the parameters for the test case and updates the form
 var param_struct = {}
 fetch("/api/v1/test/get_params/" + uri_get_param('test_name'),
 {
@@ -22,6 +23,7 @@ fetch("/api/v1/test/get_params/" + uri_get_param('test_name'),
     update_form(document.getElementById("param-form"), 0);
 });
 
+//Dynamically creates input fields for the parameters
 function update_form(targetElement, level) {
     let params = param_struct;
     console.log('params:', params);
