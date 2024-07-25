@@ -128,7 +128,7 @@ function submit_form_data() {
             value = value;
         }
 
-        jsonData[key] = value ? value : flatten_param_struct[key].value;
+        jsonData[`${key}.value`] = value ? value : flatten_param_struct[key].value;
     }
 
     // Log the JSON object to the console
@@ -171,6 +171,25 @@ function readonly_form() {
     //Change the style of the submit button
     const submitButton = document.getElementById('submit-form');
     submitButton.textContent = 'Submitted';
+}
+
+//This function puts the form in writable mode
+function writable_form(){
+    // Get the form element
+    const formElement = document.getElementById('param-form');
+
+    //Put the form in readonly mode
+    let inputs = formElement.getElementsByTagName('input');
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].readOnly = false;
+        //Change the style of the input
+        inputs[i].style.backgroundColor = '#ffffff';
+    }
+
+    //Change the style of the submit button
+    const submitButton = document.getElementById('submit-form');
+    submitButton.textContent = 'Submit';
+
 }
 
 
@@ -217,14 +236,12 @@ function connectSerial() {
         connectButton.disabled = false;
     });
 }
-
 // Get the connect button
 const connectButton = document.getElementById('connect-serial');
-
 // Add an event listener to the connect button
 connectButton.addEventListener('click', connectSerial);
 
-//Function to check it the serial is already connected or not
+//Function to check if the serial is already connected or not
 function updateSerialStatus(){
     // Make a GET request
     fetch("/api/v1/status/connected", {
@@ -258,7 +275,7 @@ function updateSerialStatus(){
 
 //Function to update the serial port dropdown list
 function updateSerialPorts() {
-    // Make a GET request to /api/v1/printer/ports
+    // Make a GET request to /api/v1/printer/port_list
     fetch("/api/v1/printer/port_list", {
         method: "GET",
         headers: {
@@ -270,6 +287,9 @@ function updateSerialPorts() {
         console.log("Serial ports:", json);
         // Get the serial port dropdown list
         const serialPortDropdown = document.getElementById('serial-port');
+
+        //Save previous selected value
+        let previous_selected = serialPortDropdown.value;
 
         // Clear the dropdown list
         serialPortDropdown.innerHTML = '';
@@ -284,7 +304,13 @@ function updateSerialPorts() {
 
         //If there is any option put the first option as selected
         if (json.ports.length > 0) {
-            serialPortDropdown.selectedIndex = 0;
+            //If the previous selected value is in the list, select it
+            if(json.ports.includes(previous_selected)){
+                serialPortDropdown.value = previous_selected;
+                serialPortDropdown.selectedIndex = json.ports.indexOf(previous_selected);
+            }else{
+                serialPortDropdown.selectedIndex = 0;
+            }
         }else{
             const option = document.createElement('option');
             option.value = "No ports";
@@ -298,16 +324,15 @@ function updateSerialPorts() {
         }
     });
 }
-// updateSerialPorts();
 
 // Call a function to update the serial port_list every 5 seconds
 function update_cycle_interval_func(){
     updateSerialStatus();
     updateSerialPorts();
+    updatePrintStatus();
 }
 update_cycle_interval_func();
 setInterval(update_cycle_interval_func, 5000);
-
 
 
 // Function to update the progress bar
@@ -319,28 +344,31 @@ function updateProgressBar(percentage) {
 }
 
 // Function to simulate work progress
-function simulateWorkProgress(estimatedTime) {
-    let progress = 0;
-    const intervalTime = 100; // Update every 100 ms
-    const totalIntervals = (estimatedTime * 1000) / intervalTime;
-
-    const interval = setInterval(() => {
-        progress += 100 / totalIntervals; // Calculate the percentage progress
-        if (progress > 100) progress = 100;
-        updateProgressBar(progress);
-
-        if (progress === 100) clearInterval(interval);
-    }, intervalTime);
+function updatePrintStatus() {
+    //First call the api to get the print status
+    fetch("/api/v1/status", {
+        method: "GET",
+        headers: {
+            "Content-type": "application/json",
+        },
+    }).then((response) => response.json())
+    .then((json) => {
+        console.log("Print status:", json);
+        // if the status is ready it means the progressbar should be 100%
+        if(json.state === 'READY'){
+            updateProgressBar(100);
+            writable_form();
+        }else{
+            idx = json["progress"]["current_gcode_idx"]
+            if(idx < 0){
+                updateProgressBar(0);
+            }
+            total = json["progress"]["current_gcode_count_len"]
+            updateProgressBar(idx*100/total);
+        }
+    });
+        
 }
-
-// Add an event listener to the submit button to start the work progress simulation
-//const submitButton = document.getElementById('submit-form');
-submitButton.addEventListener('click', () => {
-    // Estimate the print time from the parameters (mockup for the example)
-    const estimatedTime = 30; // This value should be fetched or calculated from the backend
-    simulateWorkProgress(estimatedTime);
-});
-
 
 // Function to go back to the previous page
 function goBack() {

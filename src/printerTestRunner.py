@@ -18,6 +18,8 @@ class PrinterTestRunner:
                 SimpleWall()
             ]
         self.state = "READY"
+        self.current_gcode_count_len = 0 #The amount of Gcode commands that have to run to get the test completed
+        self.current_gcode_idx = -1 #The index of the current Gcode command that is running (Updates in the testrun_thread)
         self.testrun_thread = None
         self.testrun_thread_log = []
         self.max_thread_log = 100
@@ -31,6 +33,15 @@ class PrinterTestRunner:
     
     def get_test_list(self):
         return self.test_list
+    
+    def get_status(self):
+        output = {}
+        output["state"] = self.state
+        output["progress"] = {
+            "current_gcode_count_len": self.current_gcode_count_len,
+            "current_gcode_idx": self.current_gcode_idx
+        }
+        return output
 
     def launch_testrun(self, test_name, parameters):
 
@@ -55,15 +66,22 @@ class PrinterTestRunner:
     def testrun(self, test_obj):
         self.state = "RUNNING"
         gcode_list = test_obj.generate_gcode()
+        self.current_gcode_idx = 0
         
         # Wait for the printer to get ready
         time.sleep(5)
 
+        # Update the current_gcode_count_len
+        self.current_gcode_count_len = len(gcode_list)
+
         # Feed the gcode_list to the serial port
-        for gcode in gcode_list:
+        for idx, gcode in enumerate(gcode_list):
             # print(f"Sent: {gcode}")
             self.testrun_thread_log.append(f"Sent: {gcode}")
             printer_log = self.serial_printer_handler.send(gcode)
+            # Update the current_gcode_idx
+            self.current_gcode_idx = idx
+            
             # print(f"printer_log: {printer_log}")
             self.testrun_thread_log.extend(printer_log)
             # Remove the logs if it exceeds the max_thread_log
@@ -73,7 +91,6 @@ class PrinterTestRunner:
         #Done!!!
         self.state = "READY"
 
-
     def get_test_object(self, test_name):
         return next((test for test in self.test_list if test.name == test_name), None)
 
@@ -82,7 +99,6 @@ class PrinterTestRunner:
         if test_obj is None:
             return None
         return test_obj.get_parameters()
-
 
     def check_parameter_compatibility(self, test_name, parameters):
         parameter_structure = self.get_parameter_structure(test_name)

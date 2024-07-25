@@ -1,7 +1,7 @@
 
 *Done* Implement the submit functionality on the interface to start the print process
-* Write the connection button and port and buadrate settings
-* Write a way to tell if the software is still connected to the printer
+*Done* Write the connection button and port and buadrate settings
+*Done* Write a way to tell if the software is still connected to the printer
 * Implement status percentage and log
 * Get the simple wall test up and ready to use
 * Find out what test cases to have

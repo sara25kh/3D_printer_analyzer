@@ -15,8 +15,8 @@ class TestCaseBase:
     def set_parameters(self, values):
         flat_params = flatten(self.params)
         flat_values = flatten(values)
-        # print("flat_params", flat_params)
-        # print("flat_values", flat_values)
+        print("\nflat_params", flat_params)
+        print("\nflat_values", flat_values)
 
         try:
             for given_val_key, given_val_value in flat_values.items():
@@ -53,6 +53,11 @@ class TestCaseBase:
         except Exception as e:
             print(e)
             return False
+        
+        flat_params = flatten(self.params)
+        flat_values = flatten(values)
+        print("\nflat_params2:", flat_params)
+        print("\nflat_values2", flat_values)
         
         return True
     
@@ -97,6 +102,7 @@ class SimpleWall(TestCaseBase):
             # 'M190 S[first_layer_bed_temperature]          ; wait for the bed to heat up',
             # 'M83                                          ; extruder relative mode',
             'G28                                          ',#; home all axes,
+            'G90                                          ',# ;Set to Absolute Positioning
             # 'G29                                          ; Bed autolevel (optional, for BLTouch only)',
             'G92 E0                                       ',#; reset extruder',
             # 'G1 X0 Y0 F5000                               ; move to 0/0/0',
@@ -110,6 +116,20 @@ class SimpleWall(TestCaseBase):
             # 'G1 X200 Y5 F1500.0 E15                       ; draw 1st line',
             # 'G1 X200 Y5.3 Z0.3 F5000.0                    ; move to side a little',
             # 'G1 X5.3  Y5.3 Z0.3 F1500.0 E30               ; draw 2nd line'
+        ])
+
+        gcode_generator.set_end_gcode_list([
+            'G91                                          ',#; Set to Relative Positioning Mode',
+            'G1 Z10                                       ',#; Rase the nozzle 10mm high',
+            # 'M104 S0                                      ; turn off temperature',
+            # 'M140 S0                                      ; turn off heatbed',
+            # 'G28                                          ; home all axes',
+            'M84                                          ',#; disable motors',
+            # 'M107                                         ; turn off fan',
+            # 'M42 P4 S255                                  ; Turn on LED (optional)',
+            # 'M42 P5 S255',
+            # 'M42 P6 S255',
+            # 'M42 P7 S255'
         ])
 
         gcode_generator.move(self.params["start"]["x"]["value"], self.params["start"]["y"]["value"], 0)
