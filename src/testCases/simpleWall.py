@@ -62,7 +62,7 @@ class TestCaseBase:
         raise(Exception("generate_gcode(): Not implemented"))
 
 class SimpleWall(TestCaseBase):
-    name = "SimpleWall"
+    name = "simple_wall"
     def __init__(self):
         self.params = {
             "length": {
@@ -122,9 +122,8 @@ class SimpleWall(TestCaseBase):
         estimated_time = total_distance / speed
 
         return estimated_time
-
 # Run test that prints the generated gcode of this class:
 if __name__ == '__main__':
     wall_printer = SimpleWall()
     print(wall_printer.generate_gcode())
-    print("Estimated Print Time (seconds):", wall_printer.estimate_print_time())
+    # print("Estimated Print Time (seconds):", wall_printer.estimate_print_time())

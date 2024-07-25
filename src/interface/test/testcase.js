@@ -94,6 +94,10 @@ function update_form(targetElement, level) {
             }
         }
     }
+
+    //Set the "test-img-description" source image
+    const img = document.getElementById('test-img-description');
+    img.src = "../img/" + uri_get_param('test_name') + ".png";
 }
 
 //The function which validates and processes the form data when submit is clicked

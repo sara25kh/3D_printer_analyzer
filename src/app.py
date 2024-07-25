@@ -33,6 +33,10 @@ def is_iterable(value):
 def home():
     return app.send_static_file('index.html')
 
+@app.route('/favicon.ico')
+def favicon():
+    return app.send_static_file('favicon.ico')
+
 @app.route('/api/v1/status')
 def status():
     return printer_test_runner.get_status()
