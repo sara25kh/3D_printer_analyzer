@@ -65,7 +65,7 @@ class TestCaseBase:
         raise(Exception("generate_gcode(): Not implemented"))
 
 class SimpleWall(TestCaseBase):
-    name = "SimpleWall"
+    name = "simple_wall"
     def __init__(self):
         self.params = {
             "start": {
