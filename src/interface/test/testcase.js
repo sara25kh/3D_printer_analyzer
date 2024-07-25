@@ -58,13 +58,23 @@ function update_form(targetElement, level) {
         const inputDiv = document.createElement('div');
         inputDiv.classList.add('col-md-9');
         inputDiv.classList.add('form-group');
+
+        // Define a mapping of parameter keys to their units
+        const paramUnits = {
+            "length": "mm",
+            "height": "mm",
+            "alpha": "degree"
+        };
     
         // Create the input textbox
         const input = document.createElement('input');
         input.setAttribute('type', 'text');
         input.setAttribute('id', key_label);
         input.setAttribute('name', key_label);
-        input.setAttribute('placeholder', `default: ${param.value}mm`);
+        const unit = paramUnits[key_label.split('.')[0]] || ''; // split is used to handle nested keys if any
+        const placeholderText = unit ? `default: ${param.value} ${unit}` : `default: ${param.value}`;
+        // Set the placeholder with the appropriate unit
+        input.setAttribute('placeholder', placeholderText);
         input.classList.add('form-control-sm');
         inputDiv.appendChild(input);
         inputDiv.style.margin = '0';
