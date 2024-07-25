@@ -33,6 +33,10 @@ def is_iterable(value):
 def home():
     return app.send_static_file('index.html')
 
+@app.route('/api/v1/status')
+def status():
+    return printer_test_runner.get_status()
+
 @app.route('/api/v1/status/connected')
 def connected():
     if printer_test_runner.is_connected_to_printer():

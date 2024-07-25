@@ -3,7 +3,7 @@ class GCodeGenerator:
         self.commands = []
         self.extrude_rate = 1
         self.total_extrude = 0
-        self.default_speed = 1000
+        self.default_speed = 3000
         self.ending_commands = []
         self.layer_height = 0.2
         self.total_z = 0.2
