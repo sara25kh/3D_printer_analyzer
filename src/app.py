@@ -61,6 +61,17 @@ def connect_printer():
 
     return {"status": "success"}
 
+@app.route('/api/v1/printer/disconnect', methods=['POST'])
+def disconnect_printer():
+    try:
+        SingletonSerialPrinterHandler().stop()
+        printer_test_runner.unset_serial_printer_handler()
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+    return {"status": "success"}
+
+
 @app.route('/api/v1/test/get_params/<test_name>')
 def test_page(test_name):
     # Get the test list

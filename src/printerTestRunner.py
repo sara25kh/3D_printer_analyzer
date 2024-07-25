@@ -30,6 +30,9 @@ class PrinterTestRunner:
     
     def set_serial_printer_handler(self, serial_printer_handler):
         self.serial_printer_handler = serial_printer_handler
+
+    def unset_serial_printer_handler(self):
+        self.serial_printer_handler = None
     
     def get_test_list(self):
         return self.test_list

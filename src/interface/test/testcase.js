@@ -64,7 +64,7 @@ function update_form(targetElement, level) {
         input.setAttribute('type', 'text');
         input.setAttribute('id', key_label);
         input.setAttribute('name', key_label);
-        input.setAttribute('placeholder', `default: ${param.value}`);
+        input.setAttribute('placeholder', `default: ${param.value}mm`);
         input.classList.add('form-control-sm');
         inputDiv.appendChild(input);
         inputDiv.style.margin = '0';
@@ -201,6 +201,48 @@ const submitButton = document.getElementById('submit-form');
 // Add an event listener to the submit button
 submitButton.addEventListener('click', submit_form_data);
 
+
+// Function to handle disconnect button click
+function disconnectSerial() {
+    // Make a POST request to /api/v1/printer with param "cmd": "disconnect"
+    fetch("/api/v1/printer/disconnect", {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+        },
+        body: JSON.stringify({ 'cmd': 'disconnect' }),
+    })
+    .then((response) => response.json())
+    .then((json) => {
+        console.log("Disconnect request response:", json);
+        // Get the connect button
+        const connectButton = document.getElementById('connect-serial');
+
+        // Change the text of the connect button
+        connectButton.textContent = 'Connect to Printer\'s Serial';
+
+        // Enable the connect button
+        connectButton.disabled = false;
+
+        // Enable the disconnect button
+        disconnectButton.disabled = true;
+
+        // Make serial settings changeable
+        document.getElementById('serial-port').disabled = false;
+        document.getElementById('serial-baudrate').readOnly = false;
+    })
+    .catch((error) => {
+        console.log("Disconnect error:", error);
+    });
+}
+
+// Get the disconnect button
+const disconnectButton = document.getElementById('disconnect-serial');
+
+// Add an event listener to the disconnect button
+disconnectButton.addEventListener('click', disconnectSerial);
+
+
 function connectSerial() {
 
     // Get the serial selected port from the dropdown list
@@ -229,6 +271,13 @@ function connectSerial() {
 
         // Disable the connect button
         connectButton.disabled = true;
+
+        // Enable the disconnect button
+        disconnectButton.disabled = false;
+
+         // Make serial settings unchangeable
+         document.getElementById('serial-port').disabled = true;
+         document.getElementById('serial-baudrate').readOnly = true;
     })
     .catch((error) => {
         const connectButton = document.getElementById('connect-serial');
@@ -265,12 +314,27 @@ function updateSerialStatus(){
 
             // Disable the connect button
             connectButton.disabled = true;
+
+            // Enable the disconnect button
+            disconnectButton.disabled = false;
+
+            // Make serial settings unchangeable
+            document.getElementById('serial-port').disabled = true;
+            document.getElementById('serial-baudrate').readOnly = true;
+
         }else{
             // Change the text of the connect button
             connectButton.textContent = 'Connect to Printer\'s Serial';
 
             // Enable the connect button
             connectButton.disabled = false
+
+            // Disable the disconnect button
+            disconnectButton.disabled = true;
+
+            // Make serial settings changeable
+            document.getElementById('serial-port').disabled = false;
+            document.getElementById('serial-baudrate').readOnly = false;
         }
     });
 }
