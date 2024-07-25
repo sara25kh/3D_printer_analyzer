@@ -1,6 +1,7 @@
 from .serialPrinterHandler import create_serial_printer_handler_by_cli_input
 import time
 from .testCases.simpleWall import SimpleWall
+from .testCases.angledWall import AngledWall
 import threading
 
 class PrinterTestRunner:
@@ -15,7 +16,8 @@ class PrinterTestRunner:
 
     def __init__(self):
         self.test_list = [
-                SimpleWall()
+                SimpleWall(),
+                AngledWall()
             ]
         self.state = "READY"
         self.current_gcode_count_len = 0 #The amount of Gcode commands that have to run to get the test completed
@@ -120,17 +122,30 @@ if __name__ == '__main__':
     printer_test_runner.set_serial_printer_handler(serial_printer_handler)
 
     # print("SimpleWall parameter structure:", printer_test_runner.get_parameter_structure('SimpleWall'))
-
-    # Run the test
-    printer_test_runner.launch_testrun("SimpleWall", {
-        "start": {'x.value':50, 'y.value':50},
-        "end": {'x.value':100, 'y.value':50},
-        "height.value": 1
+# Example: Run the SimpleWall test
+    printer_test_runner.launch_testrun("simple_wall", {
+        "length.value": 50,
+        "height.value": 5
     })
 
     while(True):
         time.sleep(1)
-        # Print the logs & remove each printed log
+        while printer_test_runner.testrun_thread_log:
+            log = printer_test_runner.testrun_thread_log.pop(0)
+            print(log)
+
+        if printer_test_runner.state == "READY":
+            break
+
+    # Example: Run the AngledWall test
+    printer_test_runner.launch_testrun("angled_wall", {
+        "length.value": 50,
+        "height.value": 5,
+        "alpha.value": 45
+    })
+
+    while(True):
+        time.sleep(1)
         while printer_test_runner.testrun_thread_log:
             log = printer_test_runner.testrun_thread_log.pop(0)
             print(log)
