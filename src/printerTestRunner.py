@@ -2,6 +2,7 @@ from .serialPrinterHandler import *
 import time
 from .testCases.simpleWall import SimpleWall
 from .testCases.angledWall import AngledWall
+from .testCases.sharpEdge import SharpEdge
 import threading
 
 class PrinterTestRunner:
@@ -17,7 +18,8 @@ class PrinterTestRunner:
     def __init__(self):
         self.test_list = [
                 SimpleWall(),
-                AngledWall()
+                AngledWall(),
+                SharpEdge()
             ]
         self.state = "READY"
         self.current_gcode_count_len = 0 #The amount of Gcode commands that have to run to get the test completed
@@ -53,8 +55,8 @@ class PrinterTestRunner:
 
         if self.serial_printer_handler is None:
             raise Exception("Serial printer not connected")
-        if self.state != "READY":
-            raise Exception("Printer is not ready")
+        if self.state == "RUNNING":
+            raise Exception("Printer is running")
         
         test_obj = self.get_test_object(test_name)
         if not test_obj:
