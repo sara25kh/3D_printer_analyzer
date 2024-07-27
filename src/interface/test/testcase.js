@@ -63,7 +63,9 @@ function update_form(targetElement, level) {
         const paramUnits = {
             "length": "mm",
             "height": "mm",
-            "alpha": "degree"
+            "alpha": "degree",
+            "bed temp": "degree",
+            "nozzle temp": "degree"
         };
     
         // Create the input textbox
@@ -170,6 +172,35 @@ function submit_form_data() {
     //Put the form in readonly mode
     readonly_form();
 }
+
+// Function to handle cancel button click
+function cancelPrint() {
+    fetch("/api/v1/test/cancel", {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+        }
+    })
+    .then((response) => response.json())
+    .then((json) => {
+        console.log("Cancel request response:", json);
+        if (json.status === "success") {
+            // Handle successful cancel, e.g., reset the form
+            writable_form();
+            updateProgressBar(0);
+        } else {
+            alert("Error canceling the print: " + json.message);
+        }
+    })
+    .catch((error) => {
+        console.log("Cancel error:", error);
+    });
+}
+
+// Add an event listener to the cancel button
+const cancelButton = document.querySelector('.btn-secondary');
+cancelButton.addEventListener('click', cancelPrint);
+
 
 //Function that puts the form in readonly mode:
 function readonly_form() {
@@ -436,9 +467,16 @@ function updatePrintStatus() {
         console.log("Print status:", json);
         // if the status is ready it means the progressbar should be 100%
         if(json.state === 'READY'){
+            updateProgressBar(0);
+            writable_form();
+        }else if (json.state == 'FINISHED') {
             updateProgressBar(100);
             writable_form();
-        }else{
+        }else if (json.state == 'CANCELED') {
+            updateProgressBar(0);   
+            writable_form();  
+        }
+        else{
             idx = json["progress"]["current_gcode_idx"]
             if(idx < 0){
                 updateProgressBar(0);

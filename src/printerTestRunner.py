@@ -1,4 +1,4 @@
-from .serialPrinterHandler import create_serial_printer_handler_by_cli_input
+from .serialPrinterHandler import * 
 import time
 from .testCases.simpleWall import SimpleWall
 from .testCases.angledWall import AngledWall
@@ -26,6 +26,7 @@ class PrinterTestRunner:
         self.testrun_thread_log = []
         self.max_thread_log = 100
         self.serial_printer_handler = None
+        self.should_stop = False
 
     def is_connected_to_printer(self):
         return self.serial_printer_handler is not None
@@ -64,6 +65,7 @@ class PrinterTestRunner:
             raise Exception("Invalid parameters")
         print("final change:", test_obj.get_parameters())
 
+        self.should_stop = False
         self.testrun_thread = threading.Thread(target=self.testrun, args=(test_obj,))
         self.testrun_thread.start()
     
@@ -81,6 +83,11 @@ class PrinterTestRunner:
 
         # Feed the gcode_list to the serial port
         for idx, gcode in enumerate(gcode_list):
+            if self.should_stop == True:
+                self.state = "CANCELED"
+                printer_log = self.serial_printer_handler.send("G91")
+                printer_log = self.serial_printer_handler.send("G1 Z10")
+                return
             print(f"Sent: {gcode}")
             self.testrun_thread_log.append(f"Sent: {gcode}")
             printer_log = self.serial_printer_handler.send(gcode)
@@ -94,7 +101,7 @@ class PrinterTestRunner:
                 self.testrun_thread_log = self.testrun_thread_log[-self.max_thread_log:]
         
         #Done!!!
-        self.state = "READY"
+        self.state = "FINISHED"
 
     def get_test_object(self, test_name):
         return next((test for test in self.test_list if test.name == test_name), None)
@@ -110,6 +117,12 @@ class PrinterTestRunner:
         if parameter_structure is None:
             return False
         return self.check_substructure_compatibility(parameter_structure, parameters)
+    
+    def cancel_testrun(self):
+        self.should_stop = True  # Signal the test run to stop
+        # if self.serial_printer_handler:
+        #     self.serial_printer_handler.stop_printing()
+        print("sent cancel signal")
 
 
 #Test the class

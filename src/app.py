@@ -97,6 +97,15 @@ def process_test(test_name):
 
     return {"status": "success"}
 
+@app.route('/api/v1/test/cancel', methods=['POST'])
+def cancel_test():
+    try:
+        printer_test_runner.cancel_testrun()
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+    return {"status": "success"}
+
 @app.route('/test/testcase.html')
 def serve_test():
     return app.send_static_file('./test/testcase.html')

@@ -48,6 +48,8 @@ class SerialPrinterHandler:
                 break
             time.sleep(0.1)
         return recv_queue
+    
+     
 
 def create_serial_printer_handler_by_cli_input():
     serial_printer_handler = SingletonSerialPrinterHandler()
