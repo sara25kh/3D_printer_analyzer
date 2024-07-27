@@ -3,7 +3,7 @@ import time
 from .testCases.simpleWall import SimpleWall
 from .testCases.angledWall import AngledWall
 from .testCases.sharpEdge import SharpEdge
-import threading
+import threading, re
 
 class PrinterTestRunner:
     # This class recognizes the different tests and gives the output that 
@@ -104,6 +104,23 @@ class PrinterTestRunner:
         
         #Done!!!
         self.state = "FINISHED"
+    
+    # Returns a tuple of two numbers (nozzle temp, bed temp). if it can't find the tempretures it will just return (-1, -1)
+    def get_temps(self):
+        if not self.is_connected_to_printer():
+            return None
+
+        for log in self.serial_printer_handler.recv_queue[::-1]:
+            print("log:", log)
+            res = re.findall('T:([\d\.]+) E:[\d\.]+ B:([\d\.]+)', log)
+            print("res:", res)
+            if len(res) > 0:
+                data = res[0]
+                return {
+                    "nozzle_temp":data[0],
+                    "bed_temp":data[1]
+                    }
+        return None
 
     def get_test_object(self, test_name):
         return next((test for test in self.test_list if test.name == test_name), None)

@@ -41,6 +41,13 @@ def favicon():
 def status():
     return printer_test_runner.get_status()
 
+@app.route('/api/v1/status/temp')
+def status_temp():
+    temp_res = printer_test_runner.get_temps()
+    if temp_res:
+        return {"status":"success", "data":temp_res}
+    return {"status":"fail"}
+
 @app.route('/api/v1/status/connected')
 def connected():
     if printer_test_runner.is_connected_to_printer():
