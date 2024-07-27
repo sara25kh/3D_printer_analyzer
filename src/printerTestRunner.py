@@ -81,7 +81,7 @@ class PrinterTestRunner:
 
         # Feed the gcode_list to the serial port
         for idx, gcode in enumerate(gcode_list):
-            # print(f"Sent: {gcode}")
+            print(f"Sent: {gcode}")
             self.testrun_thread_log.append(f"Sent: {gcode}")
             printer_log = self.serial_printer_handler.send(gcode)
             # Update the current_gcode_idx

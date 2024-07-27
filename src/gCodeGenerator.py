@@ -1,9 +1,9 @@
 class GCodeGenerator:
     def __init__(self):
         self.commands = []
-        self.extrude_rate = 1
+        self.extrude_rate = 0.2
         self.total_extrude = 0
-        self.default_speed = 3000
+        self.default_speed = 1000
         self.ending_commands = []
         self.layer_height = 0.2
         self.total_z = 0.2
@@ -26,6 +26,7 @@ class GCodeGenerator:
         dist = ((x - self.last_position[0]) ** 2 + (y - self.last_position[1]) ** 2) ** 0.5
         self.total_extrude += self.extrude_rate * dist
         self.commands.append(f"G0 X{x} Y{y} F{speed or self.default_speed} E{self.total_extrude}")
+        self.last_position = (x, y)
 
     def go_to_next_layer(self):
         self.total_z += self.layer_height
