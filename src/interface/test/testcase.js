@@ -64,8 +64,8 @@ function update_form(targetElement, level) {
             "length": "mm",
             "height": "mm",
             "alpha": "degree",
-            "bed temp": "degree",
-            "nozzle temp": "degree"
+            "bed_temp": "degree",
+            "nozzle_temp": "degree"
         };
     
         // Create the input textbox
@@ -498,3 +498,30 @@ const homeButton = document.getElementById('home-button');
 
 // Add an event listener to the home button
 homeButton.addEventListener('click', goBack);
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Function to fetch and update temperatures
+    function updateTemperatures() {
+        fetch('/api/v1/status/temp')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const temps = data["data"];
+                    document.getElementById('bed_temp_log').innerHTML = 'Bed Temperature: ' + temps["bed_temp"] + ' °C';
+                    document.getElementById('nozzle_temp_log').textContent = 'Bed Temperature: ' + temps["nozzle_temp"] + ' °C';
+                } else {
+                    console.error('Failed to fetch temperatures');
+                }
+            })
+            .catch(error => console.error('Error fetching temperatures:', error));
+    }
+
+    // Initial fetch
+    updateTemperatures();
+
+    // Update temperatures every 3 seconds
+    setInterval(updateTemperatures, 3000);
+});

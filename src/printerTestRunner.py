@@ -3,6 +3,7 @@ import time
 from .testCases.simpleWall import SimpleWall
 from .testCases.angledWall import AngledWall
 from .testCases.sharpEdge import SharpEdge
+from .testCases.twoColumn import TwoColumn
 import threading, re
 
 class PrinterTestRunner:
@@ -19,7 +20,8 @@ class PrinterTestRunner:
         self.test_list = [
                 SimpleWall(),
                 AngledWall(),
-                SharpEdge()
+                SharpEdge(),
+                TwoColumn()
             ]
         self.state = "READY"
         self.current_gcode_count_len = 0 #The amount of Gcode commands that have to run to get the test completed
@@ -29,6 +31,7 @@ class PrinterTestRunner:
         self.max_thread_log = 100
         self.serial_printer_handler = None
         self.should_stop = False
+        self.last_print_data = None
 
     def is_connected_to_printer(self):
         return self.serial_printer_handler is not None
@@ -116,11 +119,12 @@ class PrinterTestRunner:
             print("res:", res)
             if len(res) > 0:
                 data = res[0]
-                return {
+                self.last_print_data = {
                     "nozzle_temp":data[0],
                     "bed_temp":data[1]
                     }
-        return None
+                return self.last_print_data
+        return self.last_print_data
 
     def get_test_object(self, test_name):
         return next((test for test in self.test_list if test.name == test_name), None)

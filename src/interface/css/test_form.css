@@ -59,7 +59,19 @@ input[type="text"], input[type="number"], .form-select, .form-control {
     line-height: 30px;
 }
 
+/* Ensure that the body takes full height and allows scrolling */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent body from scrolling */
+}
 
+.scrollable-container {
+    height: 100vh; /* Full viewport height */
+    overflow: auto; /* Enable scrolling */
+    padding: 20px; /* Optional padding for better appearance */
+}
 
 /* .container {
     display: flex;

@@ -38,6 +38,11 @@ class GCodeGenerator:
     
     def set_end_gcode_list(self, end_gcode_list):
         self.ending_commands = end_gcode_list
+    
+    def retract(self, amount, rise_amount = 0):
+        self.total_extrude -= amount
+        self.total_z += rise_amount
+        self.commands.append("G0 E{:.2f} Z{:.2f}".format(self.total_extrude, self.total_z))
 
     def generate(self):
         return self.commands + self.ending_commands

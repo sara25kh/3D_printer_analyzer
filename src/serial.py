@@ -16,6 +16,7 @@ class SerialHandler:
     def stop(self):
         # Implement the logic to stop the serial connection
         if self.serial is not None:
+            print("closing serial")
             self.serial.close()
             self.serial = None
 

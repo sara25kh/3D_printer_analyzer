@@ -45,7 +45,7 @@ class SerialPrinterHandler:
             if response:
                 print("res: ", response)
                 self.recv_queue.append(response)
-            if response == "ok":
+            if response == "ok" or response == "o":
                 break
             time.sleep(0.1)
         return self.recv_queue
