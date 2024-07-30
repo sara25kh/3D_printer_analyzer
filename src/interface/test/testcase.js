@@ -58,13 +58,25 @@ function update_form(targetElement, level) {
         const inputDiv = document.createElement('div');
         inputDiv.classList.add('col-md-9');
         inputDiv.classList.add('form-group');
+
+        // Define a mapping of parameter keys to their units
+        const paramUnits = {
+            "length": "mm",
+            "height": "mm",
+            "alpha": "degree",
+            "bed_temp": "degree",
+            "nozzle_temp": "degree"
+        };
     
         // Create the input textbox
         const input = document.createElement('input');
         input.setAttribute('type', 'text');
         input.setAttribute('id', key_label);
         input.setAttribute('name', key_label);
-        input.setAttribute('placeholder', `default: ${param.value}`);
+        const unit = paramUnits[key_label.split('.')[0]] || ''; // split is used to handle nested keys if any
+        const placeholderText = unit ? `default: ${param.value} ${unit}` : `default: ${param.value}`;
+        // Set the placeholder with the appropriate unit
+        input.setAttribute('placeholder', placeholderText);
         input.classList.add('form-control-sm');
         inputDiv.appendChild(input);
         inputDiv.style.margin = '0';
@@ -161,6 +173,35 @@ function submit_form_data() {
     readonly_form();
 }
 
+// Function to handle cancel button click
+function cancelPrint() {
+    fetch("/api/v1/test/cancel", {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+        }
+    })
+    .then((response) => response.json())
+    .then((json) => {
+        console.log("Cancel request response:", json);
+        if (json.status === "success") {
+            // Handle successful cancel, e.g., reset the form
+            writable_form();
+            updateProgressBar(0);
+        } else {
+            alert("Error canceling the print: " + json.message);
+        }
+    })
+    .catch((error) => {
+        console.log("Cancel error:", error);
+    });
+}
+
+// Add an event listener to the cancel button
+const cancelButton = document.querySelector('.btn-secondary');
+cancelButton.addEventListener('click', cancelPrint);
+
+
 //Function that puts the form in readonly mode:
 function readonly_form() {
     // Get the form element
@@ -205,6 +246,48 @@ const submitButton = document.getElementById('submit-form');
 // Add an event listener to the submit button
 submitButton.addEventListener('click', submit_form_data);
 
+
+// Function to handle disconnect button click
+function disconnectSerial() {
+    // Make a POST request to /api/v1/printer with param "cmd": "disconnect"
+    fetch("/api/v1/printer/disconnect", {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+        },
+        body: JSON.stringify({ 'cmd': 'disconnect' }),
+    })
+    .then((response) => response.json())
+    .then((json) => {
+        console.log("Disconnect request response:", json);
+        // Get the connect button
+        const connectButton = document.getElementById('connect-serial');
+
+        // Change the text of the connect button
+        connectButton.textContent = 'Connect to Printer\'s Serial';
+
+        // Enable the connect button
+        connectButton.disabled = false;
+
+        // Enable the disconnect button
+        disconnectButton.disabled = true;
+
+        // Make serial settings changeable
+        document.getElementById('serial-port').disabled = false;
+        document.getElementById('serial-baudrate').readOnly = false;
+    })
+    .catch((error) => {
+        console.log("Disconnect error:", error);
+    });
+}
+
+// Get the disconnect button
+const disconnectButton = document.getElementById('disconnect-serial');
+
+// Add an event listener to the disconnect button
+disconnectButton.addEventListener('click', disconnectSerial);
+
+
 function connectSerial() {
 
     // Get the serial selected port from the dropdown list
@@ -233,6 +316,13 @@ function connectSerial() {
 
         // Disable the connect button
         connectButton.disabled = true;
+
+        // Enable the disconnect button
+        disconnectButton.disabled = false;
+
+         // Make serial settings unchangeable
+         document.getElementById('serial-port').disabled = true;
+         document.getElementById('serial-baudrate').readOnly = true;
     })
     .catch((error) => {
         const connectButton = document.getElementById('connect-serial');
@@ -269,12 +359,27 @@ function updateSerialStatus(){
 
             // Disable the connect button
             connectButton.disabled = true;
+
+            // Enable the disconnect button
+            disconnectButton.disabled = false;
+
+            // Make serial settings unchangeable
+            document.getElementById('serial-port').disabled = true;
+            document.getElementById('serial-baudrate').readOnly = true;
+
         }else{
             // Change the text of the connect button
             connectButton.textContent = 'Connect to Printer\'s Serial';
 
             // Enable the connect button
             connectButton.disabled = false
+
+            // Disable the disconnect button
+            disconnectButton.disabled = true;
+
+            // Make serial settings changeable
+            document.getElementById('serial-port').disabled = false;
+            document.getElementById('serial-baudrate').readOnly = false;
         }
     });
 }
@@ -362,9 +467,16 @@ function updatePrintStatus() {
         console.log("Print status:", json);
         // if the status is ready it means the progressbar should be 100%
         if(json.state === 'READY'){
+            updateProgressBar(0);
+            writable_form();
+        }else if (json.state == 'FINISHED') {
             updateProgressBar(100);
             writable_form();
-        }else{
+        }else if (json.state == 'CANCELED') {
+            updateProgressBar(0);   
+            writable_form();  
+        }
+        else{
             idx = json["progress"]["current_gcode_idx"]
             if(idx < 0){
                 updateProgressBar(0);
@@ -386,3 +498,30 @@ const homeButton = document.getElementById('home-button');
 
 // Add an event listener to the home button
 homeButton.addEventListener('click', goBack);
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Function to fetch and update temperatures
+    function updateTemperatures() {
+        fetch('/api/v1/status/temp')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const temps = data["data"];
+                    document.getElementById('bed_temp_log').innerHTML = 'Bed Temperature: ' + temps["bed_temp"] + ' °C';
+                    document.getElementById('nozzle_temp_log').textContent = 'Bed Temperature: ' + temps["nozzle_temp"] + ' °C';
+                } else {
+                    console.error('Failed to fetch temperatures');
+                }
+            })
+            .catch(error => console.error('Error fetching temperatures:', error));
+    }
+
+    // Initial fetch
+    updateTemperatures();
+
+    // Update temperatures every 3 seconds
+    setInterval(updateTemperatures, 3000);
+});

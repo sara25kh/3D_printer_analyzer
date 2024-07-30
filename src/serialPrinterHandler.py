@@ -13,6 +13,7 @@ class SerialPrinterHandler:
 
     def __init__(self):
         self.is_started = False
+        self.recv_queue = []
 
     def get_serial_ports_list(self):
         lister = serial.SerialPortLister()
@@ -38,16 +39,18 @@ class SerialPrinterHandler:
     def send(self, command):
         self.empty_recv_queue()
         self.serial_handler.writeln(command)
-        recv_queue = []
+        self.recv_queue = []
         while True:
             response = self.serial_handler.serial.readline().decode().strip()
             if response:
-                # print("res: ", response)
-                recv_queue.append(response)
-            if response == "ok":
+                print("res: ", response)
+                self.recv_queue.append(response)
+            if response == "ok" or response == "o":
                 break
             time.sleep(0.1)
-        return recv_queue
+        return self.recv_queue
+    
+     
 
 def create_serial_printer_handler_by_cli_input():
     serial_printer_handler = SingletonSerialPrinterHandler()

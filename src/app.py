@@ -41,6 +41,13 @@ def favicon():
 def status():
     return printer_test_runner.get_status()
 
+@app.route('/api/v1/status/temp')
+def status_temp():
+    temp_res = printer_test_runner.get_temps()
+    if temp_res:
+        return {"status":"success", "data":temp_res}
+    return {"status":"fail"}
+
 @app.route('/api/v1/status/connected')
 def connected():
     if printer_test_runner.is_connected_to_printer():
@@ -65,6 +72,17 @@ def connect_printer():
 
     return {"status": "success"}
 
+@app.route('/api/v1/printer/disconnect', methods=['POST'])
+def disconnect_printer():
+    try:
+        SingletonSerialPrinterHandler().stop()
+        printer_test_runner.unset_serial_printer_handler()
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+    return {"status": "success"}
+
+
 @app.route('/api/v1/test/get_params/<test_name>')
 def test_page(test_name):
     # Get the test list
@@ -81,6 +99,15 @@ def process_test(test_name):
     print(f"api:: request.get_json():", request.get_json())
     try:
         printer_test_runner.launch_testrun(test_name, request.get_json())
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+    return {"status": "success"}
+
+@app.route('/api/v1/test/cancel', methods=['POST'])
+def cancel_test():
+    try:
+        printer_test_runner.cancel_testrun()
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
@@ -110,5 +137,5 @@ def test_page2(test_name2):
         return "Test not found", 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port = 3000)
 

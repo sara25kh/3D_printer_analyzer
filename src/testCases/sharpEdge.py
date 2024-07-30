@@ -1,17 +1,22 @@
 from ..gCodeGenerator import GCodeGenerator
 from .testCaseBase import TestCaseBase
+import math
 
-class SimpleWall(TestCaseBase):
-    name = "simple_wall"
+class SharpEdge(TestCaseBase):
+    name = "sharp_edge"
     def __init__(self):
         self.params = {
-            "length": {
-                "type": "NUMBER",
-                "value": 50
-            },
             "height": {
                 "type": "NUMBER",
                 "value": 5,
+            },
+            "length": {
+                "type": "NUMBER",
+                "value": 20 
+            },
+            "alpha": {
+                "type": "NUMBER",
+                "value": 45  # Default angle in degrees
             },
             "bed_temp":{
                 "type":"NUMBER",
@@ -23,7 +28,7 @@ class SimpleWall(TestCaseBase):
             },
             "extrude_flowrate":{
                 "type":"NUMBER",
-                "value" : 0.5
+                "value" : 0.07
             }
         }
 
@@ -59,18 +64,27 @@ class SimpleWall(TestCaseBase):
         start_x = 50
         start_y = 100
         length = self.params["length"]["value"]
+        angle_radians = math.radians(self.params["alpha"]["value"])
+        u1 = (1,0)
+        u2 = (math.cos(angle_radians), math.sin(angle_radians))
 
-        gcode_generator.move(start_x, start_y, 0)
-        # gcode_generator.set_extrude_rate(0)
+        p1 = (start_x + (length*u1[0]), start_y + (length*u1[1]))
+        p2 = (start_x, start_y)
+        p3 = (start_x + (length*u2[0]), start_y + (length*u2[1]))
+
 
         # Move to the starting position
-        gcode_generator.move(start_x, start_y)
+        gcode_generator.move(p1[0], p1[1], 0)
 
         # Generate GCode for each layer
         while gcode_generator.total_z < self.params["height"]["value"]:
-            gcode_generator.move_and_extrude(start_x + length, start_y)
+            #We're at p1
+            gcode_generator.move_and_extrude(p2[0], p2[1])
+            gcode_generator.move_and_extrude(p3[0], p3[1])
             gcode_generator.go_to_next_layer()
-            gcode_generator.move_and_extrude(start_x, start_y)
+            #We're at p3
+            gcode_generator.move_and_extrude(p2[0], p2[1])
+            gcode_generator.move_and_extrude(p1[0], p1[1])
             gcode_generator.go_to_next_layer()
 
         return gcode_generator.generate()

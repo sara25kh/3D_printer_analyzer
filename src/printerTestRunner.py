@@ -1,7 +1,10 @@
-from .serialPrinterHandler import create_serial_printer_handler_by_cli_input
+from .serialPrinterHandler import * 
 import time
 from .testCases.simpleWall import SimpleWall
-import threading
+from .testCases.angledWall import AngledWall
+from .testCases.sharpEdge import SharpEdge
+from .testCases.twoColumn import TwoColumn
+import threading, re
 
 class PrinterTestRunner:
     # This class recognizes the different tests and gives the output that 
@@ -15,7 +18,10 @@ class PrinterTestRunner:
 
     def __init__(self):
         self.test_list = [
-                SimpleWall()
+                SimpleWall(),
+                AngledWall(),
+                SharpEdge(),
+                TwoColumn()
             ]
         self.state = "READY"
         self.current_gcode_count_len = 0 #The amount of Gcode commands that have to run to get the test completed
@@ -24,12 +30,17 @@ class PrinterTestRunner:
         self.testrun_thread_log = []
         self.max_thread_log = 100
         self.serial_printer_handler = None
+        self.should_stop = False
+        self.last_print_data = None
 
     def is_connected_to_printer(self):
         return self.serial_printer_handler is not None
     
     def set_serial_printer_handler(self, serial_printer_handler):
         self.serial_printer_handler = serial_printer_handler
+
+    def unset_serial_printer_handler(self):
+        self.serial_printer_handler = None
     
     def get_test_list(self):
         return self.test_list
@@ -47,8 +58,8 @@ class PrinterTestRunner:
 
         if self.serial_printer_handler is None:
             raise Exception("Serial printer not connected")
-        if self.state != "READY":
-            raise Exception("Printer is not ready")
+        if self.state == "RUNNING":
+            raise Exception("Printer is running")
         
         test_obj = self.get_test_object(test_name)
         if not test_obj:
@@ -59,6 +70,7 @@ class PrinterTestRunner:
             raise Exception("Invalid parameters")
         print("final change:", test_obj.get_parameters())
 
+        self.should_stop = False
         self.testrun_thread = threading.Thread(target=self.testrun, args=(test_obj,))
         self.testrun_thread.start()
     
@@ -76,7 +88,12 @@ class PrinterTestRunner:
 
         # Feed the gcode_list to the serial port
         for idx, gcode in enumerate(gcode_list):
-            # print(f"Sent: {gcode}")
+            if self.should_stop == True:
+                self.state = "CANCELED"
+                printer_log = self.serial_printer_handler.send("G91")
+                printer_log = self.serial_printer_handler.send("G1 Z10")
+                return
+            print(f"Sent: {gcode}")
             self.testrun_thread_log.append(f"Sent: {gcode}")
             printer_log = self.serial_printer_handler.send(gcode)
             # Update the current_gcode_idx
@@ -89,7 +106,25 @@ class PrinterTestRunner:
                 self.testrun_thread_log = self.testrun_thread_log[-self.max_thread_log:]
         
         #Done!!!
-        self.state = "READY"
+        self.state = "FINISHED"
+    
+    # Returns a tuple of two numbers (nozzle temp, bed temp). if it can't find the tempretures it will just return (-1, -1)
+    def get_temps(self):
+        if not self.is_connected_to_printer():
+            return None
+
+        for log in self.serial_printer_handler.recv_queue[::-1]:
+            print("log:", log)
+            res = re.findall('T:([\d\.]+) E:[\d\.]+ B:([\d\.]+)', log)
+            print("res:", res)
+            if len(res) > 0:
+                data = res[0]
+                self.last_print_data = {
+                    "nozzle_temp":data[0],
+                    "bed_temp":data[1]
+                    }
+                return self.last_print_data
+        return self.last_print_data
 
     def get_test_object(self, test_name):
         return next((test for test in self.test_list if test.name == test_name), None)
@@ -105,6 +140,12 @@ class PrinterTestRunner:
         if parameter_structure is None:
             return False
         return self.check_substructure_compatibility(parameter_structure, parameters)
+    
+    def cancel_testrun(self):
+        self.should_stop = True  # Signal the test run to stop
+        # if self.serial_printer_handler:
+        #     self.serial_printer_handler.stop_printing()
+        print("sent cancel signal")
 
 
 #Test the class
@@ -117,17 +158,30 @@ if __name__ == '__main__':
     printer_test_runner.set_serial_printer_handler(serial_printer_handler)
 
     # print("SimpleWall parameter structure:", printer_test_runner.get_parameter_structure('SimpleWall'))
-
-    # Run the test
-    printer_test_runner.launch_testrun("SimpleWall", {
-        "start": {'x.value':50, 'y.value':50},
-        "end": {'x.value':100, 'y.value':50},
-        "height.value": 1
+# Example: Run the SimpleWall test
+    printer_test_runner.launch_testrun("simple_wall", {
+        "length.value": 50,
+        "height.value": 5
     })
 
     while(True):
         time.sleep(1)
-        # Print the logs & remove each printed log
+        while printer_test_runner.testrun_thread_log:
+            log = printer_test_runner.testrun_thread_log.pop(0)
+            print(log)
+
+        if printer_test_runner.state == "READY":
+            break
+
+    # Example: Run the AngledWall test
+    printer_test_runner.launch_testrun("angled_wall", {
+        "length.value": 50,
+        "height.value": 5,
+        "alpha.value": 45
+    })
+
+    while(True):
+        time.sleep(1)
         while printer_test_runner.testrun_thread_log:
             log = printer_test_runner.testrun_thread_log.pop(0)
             print(log)
