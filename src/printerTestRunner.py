@@ -1,4 +1,5 @@
 from .serialPrinterHandler import * 
+from .serialPrinterHandler import SerialPrinterHandler
 import time
 from .testCases.simpleWall import SimpleWall
 from .testCases.angledWall import AngledWall
