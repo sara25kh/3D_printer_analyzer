@@ -1,30 +1,45 @@
+/* Container Styling */
 .container {
     display: flex;
-    align-items: flex-start; /* Changed from center to flex-start */
+    align-items: flex-start;
     justify-content: space-between;
     height: 100vh;
     padding: 20px;
+    background-color: #f5f5f5; /* Light background color */
 }
 
+/* Form Container Styling */
 .form-container {
     flex: 1;
     padding: 20px;
-    max-height: 100%; /* Ensures the form doesn't exceed the container height */
-    overflow-y: auto; /* Allows vertical scrolling if the content overflows */
+    max-height: 100%;
+    overflow-y: auto;
+    background-color: #ffffff; /* White background for the form */
+    border: 2px solid #ddd; 
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
 }
 
+/* Image Container Styling */
 .image-container {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
+    background-color: #ffffff; /* White background for the image */
+    border: 2px solid #ddd; 
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
 }
 
+/* Image Styling */
 img {
     max-width: 100%;
     height: auto;
+    border-radius: 10px; /* Rounded corners for the image */
 }
 
+/* Form Styling */
 form {
     display: flex;
     flex-direction: column;
@@ -32,45 +47,89 @@ form {
 
 label {
     margin-bottom: 5px;
+    font-weight: bold; /* Bold labels */
+    color: #333333; /* Dark text color */
 }
 
+/* Input and Select Styling */
 input[type="text"], input[type="number"], .form-select, .form-control {
     width: 100%;
-    padding: 5px;
+    padding: 10px; /* Increased padding for better usability */
     margin-bottom: 10px;
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow for depth */
+    transition: border-color 0.3s ease; /* Smooth transition for border color */
 }
 
+input[type="text"]:focus, input[type="number"]:focus, .form-select:focus, .form-control:focus {
+    border-color: #4CAF50; /* Highlighted border on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Button Container Styling */
 .button-container {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
 }
 
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px; /* Rounded corners for buttons */
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text color */
+    font-weight: bold; /* Bold text */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transitions */
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover */
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+button:active {
+    transform: translateY(0); /* Reset lift on click */
+}
+
+/* Serial Connect Container Styling */
 .serial-connect-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
+/* Progress Bar Styling */
 .progress {
     height: 30px;
     margin-top: 20px;
+    border-radius: 5px; /* Rounded corners for the progress bar */
+    background-color: #e0e0e0; /* Light grey background */
 }
 
 .progress-bar {
     line-height: 30px;
+    background-color: #4CAF50; /* Green progress */
+    color: white; /* White text color */
+    border-radius: 5px; /* Rounded corners for the progress bar */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Light shadow */
 }
 
-/* Ensure that the body takes full height and allows scrolling */
+/* Scrollable Container Styling */
+.scrollable-container {
+    height: 100vh;
+    overflow: auto;
+    padding: 20px;
+    background-color: #f5f5f5; /* Match the background with the container */
+}
+
+/* HTML & Body Styling */
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden; /* Prevent body from scrolling */
-}
-
-.scrollable-container {
-    height: 100vh; /* Full viewport height */
-    overflow: auto; /* Enable scrolling */
-    padding: 20px; /* Optional padding for better appearance */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font family */
 }
