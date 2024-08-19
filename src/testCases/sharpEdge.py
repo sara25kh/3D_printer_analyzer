@@ -104,6 +104,6 @@ class SharpEdge(TestCaseBase):
         return estimated_time
 # Run test that prints the generated gcode of this class:
 if __name__ == '__main__':
-    wall_printer = SimpleWall()
+    wall_printer = SharpEdge()
     print(wall_printer.generate_gcode())
     # print("Estimated Print Time (seconds):", wall_printer.estimate_print_time())

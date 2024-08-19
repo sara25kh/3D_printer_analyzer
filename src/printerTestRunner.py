@@ -4,6 +4,7 @@ from .testCases.simpleWall import SimpleWall
 from .testCases.angledWall import AngledWall
 from .testCases.sharpEdge import SharpEdge
 from .testCases.twoColumn import TwoColumn
+from .testCases.cylinder import Cylinder
 import threading, re
 from . import database
 
@@ -22,7 +23,8 @@ class PrinterTestRunner:
                 SimpleWall(),
                 AngledWall(),
                 SharpEdge(),
-                TwoColumn()
+                TwoColumn(),
+                Cylinder()
             ]
         self.state = "READY"
         self.current_gcode_count_len = 0 #The amount of Gcode commands that have to run to get the test completed
