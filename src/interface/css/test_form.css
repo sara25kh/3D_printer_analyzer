@@ -1,13 +1,16 @@
 .container {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Changed from center to flex-start */
     justify-content: space-between;
     height: 100vh;
     padding: 20px;
 }
 
 .form-container {
+    flex: 1;
     padding: 20px;
+    max-height: 100%; /* Ensures the form doesn't exceed the container height */
+    overflow-y: auto; /* Allows vertical scrolling if the content overflows */
 }
 
 .image-container {
@@ -49,7 +52,6 @@ input[type="text"], input[type="number"], .form-select, .form-control {
     gap: 10px;
 }
 
-
 .progress {
     height: 30px;
     margin-top: 20px;
@@ -72,67 +74,3 @@ html, body {
     overflow: auto; /* Enable scrolling */
     padding: 20px; /* Optional padding for better appearance */
 }
-
-/* .container {
-    display: flex;
-    align-items: center;
-}
-
-.form-container {
-    flex: 1;
-    padding: 20px;
-    position: relative;
-    right: -350px;
-    top: 50%;
-}
-
-.image-container {
-    flex: 1;
-    padding: 20px;
-}
-
-img {
-    max-width: 100%;
-    height: auto;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-}
-
-label {
-    margin-bottom: 10px;
-}
-
-input[type="number"] {
-    width: 100%;
-    padding: 5px;
-    margin-bottom: 10px;
-}
-
-.button-container {
-    display: flex;
-    justify-content: space-between;
-} */
-
-
-
-
-
-
-/* button {
-    padding: 10px 20px;
-    margin-right: 10px;
-    color: rgb(44, 31, 120);
-    background-color: rgb(135, 201, 179);
-    border-color: rgb(26, 51, 43);
-    position: relative;
-    right: -30px;
-    top: 200px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-    color: rgb(78, 15, 188);
-} */

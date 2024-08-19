@@ -525,3 +525,67 @@ document.addEventListener('DOMContentLoaded', function () {
     // Update temperatures every 3 seconds
     setInterval(updateTemperatures, 3000);
 });
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    const paramForm = document.getElementById('param-form');
+    const profileSelect = document.getElementById('profile-select');
+    const saveProfileButton = document.getElementById('save-profile');
+
+    // Fetch profiles and populate the dropdown
+    fetch('/api/v1/profiles')
+        .then(response => response.json())
+        .then(profiles => {
+            profiles.forEach(profile => {
+                const option = document.createElement('option');
+                option.value = profile;
+                option.textContent = profile;
+                profileSelect.appendChild(option);
+            });
+        });
+
+    // Load profile when selected
+    profileSelect.addEventListener('change', function() {
+        const selectedProfile = this.value;
+        if (selectedProfile) {
+            fetch(`/api/v1/profiles/${selectedProfile}`)
+                .then(response => response.json())
+                .then(data => {
+                    Object.keys(data).forEach(key => {
+                        const input = document.getElementById(key);
+                        if (input) {
+                            input.value = data[key].value;
+                        }
+                    });
+                });
+        }
+    });
+
+    // Save profile
+    saveProfileButton.addEventListener('click', function() {
+        const formData = new FormData(paramForm);
+        const params = {};
+        formData.forEach((value, key) => {
+            params[key] = { value };
+        });
+
+        const profileName = prompt("Enter profile name:");
+        if (profileName) {
+            fetch('/api/v1/profiles', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ profile_name: profileName, params })
+            }).then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const option = document.createElement('option');
+                    option.value = profileName;
+                    option.textContent = profileName;
+                    profileSelect.appendChild(option);
+                }
+            });
+        }
+  });})

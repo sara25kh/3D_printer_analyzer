@@ -5,6 +5,7 @@ from .testCases.angledWall import AngledWall
 from .testCases.sharpEdge import SharpEdge
 from .testCases.twoColumn import TwoColumn
 import threading, re
+from . import database
 
 class PrinterTestRunner:
     # This class recognizes the different tests and gives the output that 
@@ -32,6 +33,9 @@ class PrinterTestRunner:
         self.serial_printer_handler = None
         self.should_stop = False
         self.last_print_data = None
+
+        for test_c in self.test_list:
+            database.init_test_table(test_c.name, test_c.params)
 
     def is_connected_to_printer(self):
         return self.serial_printer_handler is not None
