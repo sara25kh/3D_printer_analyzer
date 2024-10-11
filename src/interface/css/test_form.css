@@ -140,14 +140,19 @@ html, body {
     list-style-type: none;
     padding: 0;
     margin: 0;
+    width: 91.5%; /* Adjust width as needed */
 }
 
 .dropdown-item {
     padding: 8px;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #ccc;
     cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+    background: #f0f0f0; /* Highlight on hover */
 }
 
 .trash-icon {

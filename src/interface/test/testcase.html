@@ -48,11 +48,21 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 form-container">
-                    <div class="profile-select-container">
+
+                    <!-- <div class="profile-select-container">
                         <select id="profile-select" class="form-select">
                             <option value="" selected>Select a Profile</option>
                         </select>
+                    </div> -->
+                    <!-- HTML structure for the custom dropdown -->
+                    <div id="profile-dropdown-container">
+                        <div id="selected-profile" style="border: 1px solid #ccc; padding: 8px; cursor: pointer;">
+                            Select Profile
+                        </div>
+                        <ul id="profile-dropdown" style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 1000;"></ul>
+                        <select id="profile-select" style="display: none;"></select> <!-- Hidden original select -->
                     </div>
+
                     <form id="param-form" class="form">
                         <!-- Form fields will be generated here -->
                     </form>

@@ -533,28 +533,84 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener("DOMContentLoaded", function() {
     const paramForm = document.getElementById('param-form');
     const profileSelect = document.getElementById('profile-select');
+    const profileDropdown = document.getElementById('profile-dropdown'); // Custom dropdown
+    const selectedProfile = document.getElementById('selected-profile'); // Display area for selected profile
     const saveProfileButton = document.getElementById('save-profile');
 
     // Fetch profiles and populate the dropdown
     fetch('/api/v1/test/profile/' + uri_get_param('test_name'))
-        .then(response => response.json())
-        .then(profiles => {
-            profiles.forEach(profile => {
-                const option = document.createElement('option');
-                option.value = profile["profile_name"];
-                option.textContent = profile["profile_name"];
-                profileSelect.appendChild(option);
-            });
-        });
+    .then(response => response.json())
+    .then(profiles => {
+        profiles.forEach(profile => {
+        //     const option = document.createElement('option');
+        //     option.value = profile["profile_name"];
+        //     option.textContent = profile["profile_name"];
+        //     profileSelect.appendChild(option);
 
-    // Load profile when selected
-    profileSelect.addEventListener('change', function() {
-        const selectedProfile = this.value;
-        if (selectedProfile) {
-            fetch(`/api/v1/test/profile/${uri_get_param('test_name')}`)
+            // Create a list item for each profile
+            const listItem = document.createElement('li');
+            listItem.classList.add('dropdown-item');
+            listItem.textContent = profile["profile_name"];
+            listItem.dataset.profileName = profile["profile_name"];
+
+            // Create the trashcan icon
+            const trashIcon = document.createElement('span');
+            trashIcon.classList.add('trash-icon');
+            trashIcon.innerHTML = '🗑️'; // Use emoji or font awesome icon
+            trashIcon.style.cursor = 'pointer';
+
+            // Append the trashcan to the list item
+            listItem.appendChild(trashIcon);
+
+            // Append the list item to the custom dropdown
+            profileDropdown.appendChild(listItem);
+
+            // Add the option to the hidden original select (if needed for form submission)
+            const option = document.createElement('option');
+            option.value = profile["profile_name"];
+            option.textContent = profile["profile_name"];
+            profileSelect.appendChild(option);
+
+            // Add click event to delete profile on trashcan click
+            trashIcon.addEventListener('click', function(event) {
+                event.stopPropagation(); // Prevent triggering other events on the list item
+
+                const profileName = listItem.dataset.profileName;
+
+                // Call API to delete the profile (or handle it as needed)
+                fetch(`/api/v1/test/profile/delete/${profileName}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Remove from the custom dropdown
+                        profileDropdown.removeChild(listItem);
+                        // Remove from the hidden select
+                        Array.from(profileSelect.options).forEach(option => {
+                            if (option.value === profileName) {
+                                profileSelect.removeChild(option);
+                            }
+                        });
+                    } else {
+                        alert('Error deleting profile');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            });
+
+            // Add event to select profile from custom dropdown
+            listItem.addEventListener('click', function() {
+                selectedProfile.textContent = profile["profile_name"]; // Update the display
+                profileSelect.value = profile["profile_name"]; // Set the value of hidden select
+                profileDropdown.style.display = 'none'; // Close the dropdown
+
+                fetch(`/api/v1/test/profile/${uri_get_param('test_name')}`)
                 .then(response => response.json())
                 .then(data => {
-                    const result = data.find(item => item.profile_name === selectedProfile);
+                    const result = data.find(item => item.profile_name === profile["profile_name"]);
                     Object.keys(result).forEach(key => {
                         const input = document.getElementById(key);
                         if (input) {
@@ -562,8 +618,45 @@ document.addEventListener("DOMContentLoaded", function() {
                         }
                     });
                 });
+            });
+        });
+    });
+
+    // Toggle dropdown on selected profile click
+    selectedProfile.addEventListener('click', function() {
+        console.log("selected Profile is clidcked!!!");
+        if (profileDropdown.style.display === 'none' || profileDropdown.style.display === '') {
+            profileDropdown.style.display = 'block'; // Show dropdown
+        } else {
+            profileDropdown.style.display = 'none'; // Hide dropdown
         }
     });
+
+
+    // Close dropdown if clicked outside
+    document.addEventListener('click', function(event) {
+        if (!profileDropdown.contains(event.target) && event.target !== selectedProfile) {
+            profileDropdown.style.display = 'none'; // Close dropdown
+        }
+    });
+
+    // // Load profile when selected
+    // profileSelect.addEventListener('change', function() {
+    //     const selectedProfile = this.value;
+    //     if (selectedProfile) {
+    //         fetch(`/api/v1/test/profile/${uri_get_param('test_name')}`)
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 const result = data.find(item => item.profile_name === selectedProfile);
+    //                 Object.keys(result).forEach(key => {
+    //                     const input = document.getElementById(key);
+    //                     if (input) {
+    //                         input.value = result[key];
+    //                     }
+    //                 });
+    //             });
+    //     }
+    // });
 
     // Save profile
     saveProfileButton.addEventListener('click', function() {
@@ -629,4 +722,5 @@ document.addEventListener("DOMContentLoaded", function() {
                 profileSelect.appendChild(option);
             }
         });
-  });})
+    });
+});
