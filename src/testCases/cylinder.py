@@ -71,8 +71,8 @@ class Cylinder(TestCaseBase):
         circle_resolution = self.params["circle_resolution"]["value"]
         angle_increment = 360 / circle_resolution
 
-        start_x = 50  # Start position X
-        start_y = 50  # Start position Y
+        start_x = 100  # Start position X
+        start_y = 100  # Start position Y
 
         # Generate GCode for each layer
         while gcode_generator.total_z < height:

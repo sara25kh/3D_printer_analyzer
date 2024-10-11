@@ -11,6 +11,8 @@ import os
 from .printerTestRunner import PrinterTestRunner
 from .serialPrinterHandler import SingletonSerialPrinterHandler
 
+from . import database
+
 script_dir = os.path.dirname(os.path.realpath(__file__))
 interface_dir = os.path.join(script_dir, 'interface')
 
@@ -112,6 +114,25 @@ def cancel_test():
         return {"status": "error", "message": str(e)}
 
     return {"status": "success"}
+
+#Profile
+@app.route('/api/v1/test/profile/<test_name>', methods=["POST"])
+def insert_profile(test_name):
+    
+    print(f"api:: received test_name: {test_name}")
+    print(f"api:: request.get_json():", request.get_json())
+    database.insert_row(test_name, request.get_json())
+
+    return {"status": "success"}
+
+
+@app.route('/api/v1/test/profile/<test_name>', methods=["GET"])
+def query_profile(test_name):
+
+    return database.fetch_test_data(test_name)
+
+
+    
 
 @app.route('/test/testcase.html')
 def serve_test():

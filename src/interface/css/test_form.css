@@ -133,3 +133,23 @@ html, body {
     overflow: hidden; /* Prevent body from scrolling */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font family */
 }
+
+
+/*Profile*/
+#profile-dropdown {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-item {
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.trash-icon {
+    margin-left: 10px;
+}

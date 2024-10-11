@@ -173,8 +173,10 @@ function submit_form_data() {
     readonly_form();
 }
 
+
 // Function to handle cancel button click
 function cancelPrint() {
+    console.log("Sent cancel req");
     fetch("/api/v1/test/cancel", {
         method: "POST",
         headers: {
@@ -198,7 +200,7 @@ function cancelPrint() {
 }
 
 // Add an event listener to the cancel button
-const cancelButton = document.querySelector('.btn-secondary');
+const cancelButton = document.querySelector('#cancel-button');
 cancelButton.addEventListener('click', cancelPrint);
 
 
@@ -511,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.status === 'success') {
                     const temps = data["data"];
                     document.getElementById('bed_temp_log').innerHTML = 'Bed Temperature: ' + temps["bed_temp"] + ' °C';
-                    document.getElementById('nozzle_temp_log').textContent = 'Bed Temperature: ' + temps["nozzle_temp"] + ' °C';
+                    document.getElementById('nozzle_temp_log').textContent = 'Nozzle Temperature: ' + temps["nozzle_temp"] + ' °C';
                 } else {
                     console.error('Failed to fetch temperatures');
                 }
@@ -534,13 +536,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const saveProfileButton = document.getElementById('save-profile');
 
     // Fetch profiles and populate the dropdown
-    fetch('/api/v1/profiles')
+    fetch('/api/v1/test/profile/' + uri_get_param('test_name'))
         .then(response => response.json())
         .then(profiles => {
             profiles.forEach(profile => {
                 const option = document.createElement('option');
-                option.value = profile;
-                option.textContent = profile;
+                option.value = profile["profile_name"];
+                option.textContent = profile["profile_name"];
                 profileSelect.appendChild(option);
             });
         });
@@ -549,13 +551,14 @@ document.addEventListener("DOMContentLoaded", function() {
     profileSelect.addEventListener('change', function() {
         const selectedProfile = this.value;
         if (selectedProfile) {
-            fetch(`/api/v1/profiles/${selectedProfile}`)
+            fetch(`/api/v1/test/profile/${uri_get_param('test_name')}`)
                 .then(response => response.json())
                 .then(data => {
-                    Object.keys(data).forEach(key => {
+                    const result = data.find(item => item.profile_name === selectedProfile);
+                    Object.keys(result).forEach(key => {
                         const input = document.getElementById(key);
                         if (input) {
-                            input.value = data[key].value;
+                            input.value = result[key];
                         }
                     });
                 });
@@ -564,28 +567,66 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Save profile
     saveProfileButton.addEventListener('click', function() {
-        const formData = new FormData(paramForm);
-        const params = {};
-        formData.forEach((value, key) => {
-            params[key] = { value };
-        });
+            
+        // Get the form element
+        const formElement = document.getElementById('param-form');
 
-        const profileName = prompt("Enter profile name:");
-        if (profileName) {
-            fetch('/api/v1/profiles', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ profile_name: profileName, params })
-            }).then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    const option = document.createElement('option');
-                    option.value = profileName;
-                    option.textContent = profileName;
-                    profileSelect.appendChild(option);
+        // Get the form data
+        const formData = new FormData(formElement);
+
+        // Get the flatten version of param struct:
+        let flatten_param_struct = {};
+        function flatten_params(params, prefix) {
+            for (let key in params) {
+                if (params.hasOwnProperty(key)) {
+                    if (params[key].hasOwnProperty('type')) {
+                        flatten_param_struct[prefix + key] = params[key];
+                    } else {
+                        flatten_params(params[key], prefix + key + '.');
+                    }
                 }
-            });
+            }
         }
+        flatten_params(param_struct, '');
+
+        // Convert the form data to a JSON object
+        const jsonData = {};
+        for (let [key, value] of formData) {
+            //Check value based on flatten_param_struct[key].type
+            if (flatten_param_struct[key].type === 'NUMBER') {
+                value = parseFloat(value);
+            } else if (flatten_param_struct[key].type === 'STRING') {
+                value = value;
+            }
+
+            jsonData[`${key}`] = value ? value : flatten_param_struct[key].value;
+        }
+
+        //Get profile name from user
+        const profileName = prompt("Enter profile name:");
+        if(!profileName){
+            console.log("Operation Canceled");
+            return;
+        }
+        jsonData["profile_name"] = profileName;
+
+
+        console.log(`Form data is: ${JSON.stringify(jsonData, null, 2)}`);
+
+
+        fetch(`/api/v1/test/profile/${uri_get_param('test_name')}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData)
+        }).then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const option = document.createElement('option');
+                option.value = profileName;
+                option.textContent = profileName;
+                profileSelect.appendChild(option);
+            }
+        });
   });})
