@@ -125,6 +125,24 @@ def insert_profile(test_name):
 
     return {"status": "success"}
 
+@app.route('/api/v1/test/profile/delete/<profile_name>', methods=["DELETE"])
+def delete_profile(profile_name):
+    test_name = request.args.get('test_name')  # Assuming test_name is sent as a query parameter
+
+    if not test_name:
+        return {"status": "error", "message": "test_name is required"}, 400
+
+    print(f"api:: received test_name: {test_name}, profile_name: {profile_name}")
+
+    try:
+        # Call the delete_row function to delete the profile
+        database.delete_row(test_name, profile_name)
+        return {"status": "success", "message": f"Profile '{profile_name}' deleted successfully"}
+    except Exception as e:
+        print(f"Error deleting profile: {e}")
+        return {"status": "error", "message": "An error occurred while deleting the profile"}, 500
+
+
 
 @app.route('/api/v1/test/profile/<test_name>', methods=["GET"])
 def query_profile(test_name):

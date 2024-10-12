@@ -576,9 +576,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 event.stopPropagation(); // Prevent triggering other events on the list item
 
                 const profileName = listItem.dataset.profileName;
+                const testName = uri_get_param('test_name');  // Assuming test_name is obtained from the URL or elsewhere
 
-                // Call API to delete the profile (or handle it as needed)
-                fetch(`/api/v1/test/profile/delete/${profileName}`, {
+                // Call API to delete the profile
+                fetch(`/api/v1/test/profile/delete/${profileName}?test_name=${testName}`, {
                     method: 'DELETE',
                 })
                 .then(response => {

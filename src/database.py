@@ -67,6 +67,28 @@ def insert_row(test_name, row_data):
         conn.close()
 
 
+def delete_row(test_name, profile_name):
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Check if the profile_name exists
+        cursor.execute(f"SELECT COUNT(1) FROM {test_name} WHERE profile_name = ?", (profile_name,))
+        exists = cursor.fetchone()[0]
+
+        if exists:
+            # Delete the row where profile_name matches
+            cursor.execute(f"DELETE FROM {test_name} WHERE profile_name = ?", (profile_name,))
+            print(f"Deleted row with profile_name: {profile_name}")
+        else:
+            print(f"No row found with profile_name: {profile_name}")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        conn.commit()
+        conn.close()
+
 
 def fetch_test_data(test_name):
     conn = create_connection()

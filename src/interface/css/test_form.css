@@ -157,4 +157,18 @@ html, body {
 
 .trash-icon {
     margin-left: 10px;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease; /* Smooth transition for hover effects */
+}
+
+/* Hover effect */
+.trash-icon:hover {
+    color: red; /* Change color on hover */
+    transform: scale(1.2); /* Slightly enlarge the icon */
+}
+
+/* Active (when clicked) effect */
+.trash-icon:active {
+    color: darkred; /* Darker color when clicked */
+    transform: scale(1.1); /* Slightly smaller than hover state */
 }
