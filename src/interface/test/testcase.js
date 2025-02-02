@@ -65,7 +65,11 @@ function update_form(targetElement, level) {
             "height": "mm",
             "alpha": "degree",
             "bed_temp": "degree",
-            "nozzle_temp": "degree"
+            "nozzle_temp": "degree",
+            "layer_height":"mm",
+            "radius":"mm",
+            "distance":"mm",
+            "side":"mm"
         };
     
         // Create the input textbox
@@ -450,10 +454,18 @@ setInterval(update_cycle_interval_func, 5000);
 
 // Function to update the progress bar
 function updateProgressBar(percentage) {
+    // percentage = "{:.3f}".format(percentage)
+    // const progressBar = document.getElementById('progress-bar');
+    // progressBar.style.width = percentage + '%';
+    // progressBar.setAttribute('aria-valuenow', percentage);
+    // progressBar.textContent = percentage + '%';
+    // Ensure precision to 3 decimal places
+    const precisePercentage = parseFloat(percentage).toFixed(3);
+
     const progressBar = document.getElementById('progress-bar');
-    progressBar.style.width = percentage + '%';
-    progressBar.setAttribute('aria-valuenow', percentage);
-    progressBar.textContent = percentage + '%';
+    progressBar.style.width = precisePercentage + '%';
+    progressBar.setAttribute('aria-valuenow', precisePercentage);
+    progressBar.textContent = precisePercentage + '%';
 }
 
 // Function to simulate work progress

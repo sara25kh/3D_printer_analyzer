@@ -28,7 +28,7 @@ class AngledWall(TestCaseBase):
             },
             "extrude_flowrate":{
                 "type":"NUMBER",
-                "value" : 0.5
+                "value" : 0.07
             }
         }
 
@@ -38,8 +38,8 @@ class AngledWall(TestCaseBase):
 
             f'M104 S{self.params["nozzle_temp"]["value"]}', # set extruder temp
             f'M140 S{self.params["bed_temp"]["value"]}', # set bed temp
-            'M190 S60', # wait for bed temp
-            'M109 S215', # wait for extruder temp
+            f'M190 S{self.params["bed_temp"]["value"]}', # wait for bed temp
+            f'M109 S{self.params["nozzle_temp"]["value"]}', # wait for extruder temp
             'G28', # home all axes
             'G90', # set to Absolute Positioning
             'G92 E0', # reset extruder
@@ -73,30 +73,31 @@ class AngledWall(TestCaseBase):
         print('tan = ', math.tan(angle_radians))
         # Move to the starting position
         gcode_generator.move(start_x - 5 , start_y + 10)
+        gcode_generator.move(start_x  , start_y )
         x = start_x - 5
         y = start_y + 10
         dx = 0.4
-        counter = 4
-        while counter > 0 :
-            if counter % 2 == 0:
-                y = start_y + 10
-                while x < (start_x + length + 10):
-                    gcode_generator.move_and_extrude(x + dx, y)
-                    gcode_generator.move_and_extrude(x + dx , y - 20)
-                    gcode_generator.move_and_extrude(x + (2 * dx) , y - 20)
-                    gcode_generator.move_and_extrude(x + (2 * dx) , y)
-                    x = (2 * dx) + x
-            else :
-                x = start_x -5 
-                while y > start_y -10:
-                    gcode_generator.move_and_extrude(x , y - dx)
-                    gcode_generator.move_and_extrude(x + length + 10, y - dx)
-                    gcode_generator.move_and_extrude(x + length + 10, y - (2*dx))
-                    gcode_generator.move_and_extrude(x , y - (2*dx))
-                    y = y - (2 * dx)
+        # counter = 4
+        # while counter > 0 :
+        #     if counter % 2 == 0:
+        #         y = start_y + 10
+        #         while x < (start_x + length + 10):
+        #             gcode_generator.move_and_extrude(x + dx, y)
+        #             gcode_generator.move_and_extrude(x + dx , y - 20)
+        #             gcode_generator.move_and_extrude(x + (2 * dx) , y - 20)
+        #             gcode_generator.move_and_extrude(x + (2 * dx) , y)
+        #             x = (2 * dx) + x
+        #     else :
+        #         x = start_x -5 
+        #         while y > start_y -10:
+        #             gcode_generator.move_and_extrude(x , y - dx)
+        #             gcode_generator.move_and_extrude(x + length + 10, y - dx)
+        #             gcode_generator.move_and_extrude(x + length + 10, y - (2*dx))
+        #             gcode_generator.move_and_extrude(x , y - (2*dx))
+        #             y = y - (2 * dx)
 
-            counter -= 1
-            gcode_generator.go_to_next_layer()        
+            # counter -= 1
+            # gcode_generator.go_to_next_layer()        
         # gcode_generator.move_and_extrude(start_x -5 + dx, )
         # gcode_generator.move_and_extrude(start_x -10 , start_y + 10)
         # gcode_generator.move_and_extrude(start_x + 20 + length , start_y + 10)

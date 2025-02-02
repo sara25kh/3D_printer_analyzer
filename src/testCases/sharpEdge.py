@@ -38,8 +38,8 @@ class SharpEdge(TestCaseBase):
 
             f'M104 S{self.params["nozzle_temp"]["value"]}', # set extruder temp
             f'M140 S{self.params["bed_temp"]["value"]}', # set bed temp
-            'M190 S60', # wait for bed temp
-            'M109 S215', # wait for extruder temp
+            f'M190 S{self.params["bed_temp"]["value"]}', # wait for bed temp
+            f'M109 S{self.params["nozzle_temp"]["value"]}', # wait for extruder temp
             'G28', # home all axes
             'G90', # set to Absolute Positioning
             "G1 Z0.2 F720",
@@ -50,7 +50,7 @@ class SharpEdge(TestCaseBase):
             'G92 E0', # reset extruder
             'G1 Z0.2',
         ])
-
+        print("bed temp:",self.params["bed_temp"]["value"] )
         gcode_generator.set_end_gcode_list([
             'G91', # Set to Relative Positioning Mode
             'G1 Z10', # Raise the nozzle 10mm high
@@ -65,13 +65,17 @@ class SharpEdge(TestCaseBase):
         start_y = 100
         length = self.params["length"]["value"]
         angle_radians = math.radians(self.params["alpha"]["value"])
+        print("alpha:",self.params["alpha"]["value"])
         u1 = (1,0)
         u2 = (math.cos(angle_radians), math.sin(angle_radians))
 
         p1 = (start_x + (length*u1[0]), start_y + (length*u1[1]))
         p2 = (start_x, start_y)
         p3 = (start_x + (length*u2[0]), start_y + (length*u2[1]))
-
+        print("p1:",p1)
+        print("p2:",p2)
+        print("p3:",p3)
+        
 
         # Move to the starting position
         gcode_generator.move(p1[0], p1[1], 0)

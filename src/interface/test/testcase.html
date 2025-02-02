@@ -1,3 +1,77 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Case</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/test_form.css">
+</head>
+<body>
+    <div class="scrollable-container">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 form-container">
+
+                    <!-- <div class="profile-select-container">
+                        <select id="profile-select" class="form-select">
+                            <option value="" selected>Select a Profile</option>
+                        </select>
+                    </div> -->
+                    <!-- HTML structure for the custom dropdown -->
+                    <div id="profile-dropdown-container" style="margin-bottom: 15px;">
+                        <div id="selected-profile" style="border: 1px solid #ccc; padding: 8px; cursor: pointer;">
+                            Select Profile
+                        </div>
+                        <ul id="profile-dropdown" style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 1000;"></ul>
+                        <select id="profile-select" style="display: none;"></select> <!-- Hidden original select -->
+                    </div>
+
+                    <form id="param-form" class="form">
+                        <!-- Form fields will be generated here -->
+                    </form>
+                    <div class="button-container">
+                        <button class="btn btn-primary" type="button" id="submit-form">Submit</button>
+                        <button class="btn btn-secondary" type="button" id="save-profile">Save Profile</button>
+                        <button class="btn btn-secondary" type="button" id="cancel-button">Cancel</button>
+                    </div>
+
+                    <div class="temperature-display">
+                        <h3>Current Temperatures</h3>
+                        <div id="bed_temp_log">Bed Temperature: -- °C</div>
+                        <div id="nozzle_temp_log">Nozzle Temperature: -- °C</div>
+                    </div>
+                    
+                    <div class="progress" id="progress-bar-container">
+                        <div class="progress-bar" id="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+
+                    <div class="serial-connect-container">
+                        <button class="btn btn-primary" type="button" id="connect-serial">Connect to Printer's Serial</button>
+                        <button class="btn btn-danger" type="button" id="disconnect-serial">Disconnect</button>
+                        <select id="serial-port" class="form-select"></select>
+                        <input id="serial-baudrate" class="form-control" value="115200">
+                    </div>
+
+                    <div class="button-container">
+                        <button class="btn btn-secondary" type="button" id="home-button">Home</button>
+                    </div>
+
+                </div>
+                <div class="col-md-6 image-container">
+                    <img id="test-img-description" src="../img/simple_wall.png" alt="Parameter Image" id="param-image">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="testcase.js"></script>
+</body>
+</html>
+
+
+
+
+
+
 <!-- <!DOCTYPE html>
 <html>
 <head>
@@ -35,71 +109,3 @@
     <script type="text/javascript" src="testcase.js"></script>
 </html> -->
 
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Test Case</title>
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/test_form.css">
-</head>
-<body>
-    <div class="scrollable-container">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 form-container">
-
-                    <!-- <div class="profile-select-container">
-                        <select id="profile-select" class="form-select">
-                            <option value="" selected>Select a Profile</option>
-                        </select>
-                    </div> -->
-                    <!-- HTML structure for the custom dropdown -->
-                    <div id="profile-dropdown-container">
-                        <div id="selected-profile" style="border: 1px solid #ccc; padding: 8px; cursor: pointer;">
-                            Select Profile
-                        </div>
-                        <ul id="profile-dropdown" style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 1000;"></ul>
-                        <select id="profile-select" style="display: none;"></select> <!-- Hidden original select -->
-                    </div>
-
-                    <form id="param-form" class="form">
-                        <!-- Form fields will be generated here -->
-                    </form>
-                    <div class="button-container">
-                        <button class="btn btn-primary" type="button" id="submit-form">Submit</button>
-                        <button class="btn btn-secondary" type="button" id="save-profile">Save Profile</button>
-                        <button class="btn btn-secondary" type="button" id="cancel-button">Cancel</button>
-                    </div>
-
-                    <div class="temperature-display">
-                        <h2>Current Temperatures</h2>
-                        <div id="bed_temp_log">Bed Temperature: -- °C</div>
-                        <div id="nozzle_temp_log">Nozzle Temperature: -- °C</div>
-                    </div>
-
-                    <div class="progress" id="progress-bar-container">
-                        <div class="progress-bar" id="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-                    </div>
-
-                    <div class="serial-connect-container">
-                        <button class="btn btn-primary" type="button" id="connect-serial">Connect to Printer's Serial</button>
-                        <button class="btn btn-danger" type="button" id="disconnect-serial">Disconnect</button>
-                        <select id="serial-port" class="form-select"></select>
-                        <input id="serial-baudrate" class="form-control" value="115200">
-                    </div>
-
-                    <div class="button-container">
-                        <button class="btn btn-secondary" type="button" id="home-button">Home</button>
-                    </div>
-
-                </div>
-                <div class="col-md-6 image-container">
-                    <img id="test-img-description" src="../img/simple_wall.png" alt="Parameter Image" id="param-image">
-                </div>
-            </div>
-        </div>
-    </div>
-    <script type="text/javascript" src="testcase.js"></script>
-</body>
-</html>
